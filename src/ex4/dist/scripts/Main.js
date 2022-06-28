@@ -1,10 +1,10 @@
-import { ItemManager } from "../clients/ItemManager.js";
+import { ItemClient } from "../clients/ItemClient.js";
 import { Alert } from "./Alert.js";
 const EMPTY_INPUT_MSG = "Task input cannot be empty, please try again";
 
 class main {
   constructor(htmlElement) {
-    this.tasksManager = new ItemManager();
+    this.taskClient = new ItemClient();
     this.emprtyInputAlert = new Alert(htmlElement);
 
     // Action Elements //
@@ -24,13 +24,13 @@ class main {
 
     // Events init //
 
-    this.activateSortable(this.tasksManager);
+    this.activateSortable(this.taskClient);
     this.addFieldsEventListeners();
   }
 
   // Init Methods //
 
-  activateSortable(tasksManeger) {
+  activateSortable(taskClient) {
     new Sortable(this.dragArea, {
       animation: 350,
       draggable: ".task",
@@ -38,7 +38,7 @@ class main {
 
       onEnd: function (evt) {
         const tasksList = evt.item.parentElement.querySelectorAll(".task");
-        tasksManeger.reSortTasks(tasksList);
+        taskClient.reSortTasks(tasksList);
       },
     });
   }
@@ -50,7 +50,6 @@ class main {
 
     this.taskInput.onkeyup = (e) => {
       if (e.key === "Enter") {
-        console.log(e);
         e.preventDefault();
         this.onAddTaskClick(e);
       }
@@ -64,23 +63,20 @@ class main {
   }
 
   async init() {
-    console.log("Main init");
     await this.renderTasks();
   }
 
   // Action Methods //
 
   async onAddTaskClick(e) {
-    console.log(e);
     const isOk = this.canProceed();
-
     const isAlertShown = this.emprtyInputAlert.isAlertShown();
     if (!isOk && !isAlertShown) {
       this.emprtyInputAlert.toggleAlert(EMPTY_INPUT_MSG);
     }
 
     if (isOk) {
-      const isTaskAdded = await this.tasksManager.addTask(
+      const isTaskAdded = await this.taskClient.addTask(
         this.taskInput.value,
         false
       );
@@ -101,12 +97,12 @@ class main {
   }
 
   async onRemoveAllTasksClick(e) {
-    this.tasksManager.removeAllTasks();
+    await this.taskClient.removeAllTasks();
     await this.renderTasks();
   }
 
   async toggleEmptyMsg() {
-    const tasksLength = await this.tasksManager.getTasksLength();
+    const tasksLength = await this.taskClient.getTasksLength();
     if (tasksLength === 0) {
       this.emptyListMsg.classList.remove("hide");
     } else {
@@ -115,7 +111,7 @@ class main {
   }
 
   async toggleRemoveAllBtn(filteredTasks) {
-    const tasksLength = await this.tasksManager.getTasksLength();
+    const tasksLength = await this.taskClient.getTasksLength();
     const filteredTasksSize = filteredTasks.length;
     if (filteredTasks.length < tasksLength || filteredTasksSize === 0) {
       this.removeAllTasksButton.classList.add("hide");
@@ -140,14 +136,14 @@ class main {
     const taskItem = e.target.parentElement;
     taskItem.classList.toggle("task-completed");
     const taskId = taskItem.getAttribute("id");
-    this.tasksManager.toggleCompleted(parseInt(taskId));
+    await this.taskClient.toggleCompleted(parseInt(taskId));
     await this.renderTasks();
   }
 
   async onRemoveBtnClick(e) {
     const taskItem = e.target.parentElement;
     const taskId = taskItem.getAttribute("id");
-    this.tasksManager.removeTask(parseInt(taskId));
+    await this.taskClient.removeTask(parseInt(taskId));
     await this.renderTasks();
   }
 
@@ -175,7 +171,7 @@ class main {
   }
 
   async updateIDsAfterReSort() {
-    const tasks = await this.tasksManager.fetchTasks();
+    const tasks = await this.taskClient.fetchTasks();
     this.tasksList.children.forEach((task, index) =>
       task.setAttribute("id", tasks[index].id)
     );
@@ -260,9 +256,9 @@ class main {
       case "all":
         return tasksToBeFiltered;
       case "completed":
-        return tasksToBeFiltered.filter((task) => task.isCompleted === true);
+        return tasksToBeFiltered.filter((task) => task.status === true);
       case "uncompleted":
-        return tasksToBeFiltered.filter((task) => task.isCompleted === false);
+        return tasksToBeFiltered.filter((task) => task.status === false);
       default:
         return tasksToBeFiltered;
     }
@@ -274,21 +270,21 @@ class main {
       return tasks;
     } else {
       return tasks.filter((task) => {
-        return task.content.toLowerCase().includes(searchInput.toLowerCase());
+        return task.itemName.toLowerCase().includes(searchInput.toLowerCase());
       });
     }
   }
 
   async renderTasks() {
     this.tasksList.innerHTML = "";
-    const tasks = await this.tasksManager.fetchTasks();
+    const tasks = await this.taskClient.fetchTasks();
     const completeFilter = this.filterCompleteTasks(tasks);
     const filteredTasks = this.filterSearchedTasks(completeFilter);
     const self = this;
     this.toggleEmptyMsg();
     this.toggleRemoveAllBtn(filteredTasks);
     filteredTasks.forEach(function (task) {
-      const taskDiv = self.createTaskDiv(task.content, task.isCompleted);
+      const taskDiv = self.createTaskDiv(task.itemName, task.status);
       taskDiv.setAttribute("id", task.id);
       self.tasksList.appendChild(taskDiv);
       self.addTaskDivEventListeners(taskDiv);
@@ -300,5 +296,4 @@ const app = new main(document);
 
 document.addEventListener("DOMContentLoaded", async function () {
   await app.init();
-  console.log("DOMContentLoaded");
 });

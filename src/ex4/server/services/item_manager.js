@@ -1,22 +1,15 @@
-const {
-  POKEMON_WITH_ID_NOT_FOUND,
-  NOT_A_POKEMON,
-  FAILED_TO_FETCH,
-} = require("./globalConsts/GlobalConstants.js");
+const { NOT_A_POKEMON } = require("./globalConsts/GlobalConstants.js");
 const fs = require("fs");
 const PokemonClient = require("../clients/pokemon_client.js");
 const path = require("path");
+const { Item } = require("../db/models");
 
 class ItemManager {
   constructor() {
     this.pokedex = PokemonClient;
-    this.tasksFile = "../DB/tasks.json";
-    this.cacheFile = "../DB/pokemonsCache.json";
-    try {
-      this.tasks = this.getTasks();
-    } catch (e) {
-      this.tasks = [];
-    }
+    this.tasksFile = "../db/tasks.json";
+    this.cacheFile = "../db/pokemonsCache.json";
+    this.tasks = [];
   }
 
   getTasksLength() {
@@ -33,37 +26,37 @@ class ItemManager {
       this.isInputSetOfPokemonIDs(taskInput) ||
       this.pokedex.isPokemonNamesOnly(taskInput)
     ) {
-      return await this.addCatchPokemonTask(taskInput);
+      const res = await this.addCatchPokemonTask(taskInput);
+
+      return res;
     } else {
-      const isAdded = this.addToFile(taskInput, isCompleted);
+      const isAdded = await this.addTaskToFile(taskInput, isCompleted);
       return isAdded;
     }
   }
 
-  async addCatchPokemonTask(input) {
-    //check if in cache first
-    let response = null;
+  getResponseFromCache(input) {
     const cache = this.getCache();
-    const cacheItem = cache.find((item) => item.input === input);
-    if (cacheItem) {
-      response = cacheItem.response;
+    if (cache[input]) {
+      return cache[input];
+    }
+    return null;
+  }
+
+  async addCatchPokemonTask(input) {
+    let response = null;
+    if ((response = this.getResponseFromCache(input))) {
+      await this.addResponsesToTasks(input, response, true);
+      return response;
     } else {
       response = await this.getPokemonsToAdd(input);
-      this.saveResponseToCache(input, response);
-    }
-    if (response === false) {
-      return false;
-    } else if (
-      response.includes(POKEMON_WITH_ID_NOT_FOUND) ||
-      response.includes(FAILED_TO_FETCH)
-    ) {
-      this.addToFile(response, false);
-      return true;
-    } else {
-      response.forEach((pokemon) => {
-        this.addToFile(pokemon, false);
-      });
-      return true;
+      if (response === false) {
+        return false;
+      } else {
+        const res = await this.addResponsesToTasks(input, response, false);
+
+        return true;
+      }
     }
   }
 
@@ -74,76 +67,100 @@ class ItemManager {
     } else return response;
   }
 
-  addToFile(taskInput, isCompleted) {
-    const isTaskExist = this.tasks.find((task) => task.content === taskInput);
+  async addResponsesToTasks(input, response, isFromCache) {
+    if (!isFromCache) {
+      this.saveResponseToCache(input, response);
+    }
+
+    for (const pokemon of response) {
+      await this.addTaskToFile(pokemon, false);
+    }
+    return true;
+  }
+
+  async addTaskToFile(taskInput, isCompleted) {
+    const isTaskExist = this.tasks.find((task) => task.itemName === taskInput);
     if (isTaskExist) {
       return false;
     } else {
       const task = {
-        id: this.tasks.length + 1,
-        content: taskInput,
-        isCompleted: isCompleted,
+        itemName: taskInput,
+        status: isCompleted,
+        doneAt: null,
       };
       this.tasks.push(task);
-      this.saveTasksToFile();
-      return true;
+      return await this.saveTaskToDB(task);
     }
   }
 
-  toggleCompleted(id) {
-    const task = this.tasks.find((task) => task.id == id);
-    task.isCompleted = !task.isCompleted;
-    this.saveTasksToFile();
-  }
-
-  removeTask(id) {
+  async toggleCompleted(id) {
     const task = this.tasks.find((task) => {
       return task.id == id;
     });
+
     if (task) {
-      this.tasks.splice(this.tasks.indexOf(task), 1);
-      this.updateTaskIds();
-      this.saveTasksToFile();
-      return true;
-    } else return false;
+      if (task.status)
+        await Item.update(
+          { status: !task.status, doneAt: null },
+          { where: { id: task.id } }
+        );
+      else
+        await Item.update(
+          { status: !task.status, doneAt: new Date() },
+          { where: { id: task.id } }
+        );
+      task.status = !task.status;
+      return task;
+    }
   }
 
-  updateTaskIds() {
-    this.tasks.forEach((task, index) => {
-      task.id = index + 1;
+  async saveTaskToDB(task) {
+    try {
+      await Item.create(task);
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
+    return true;
+  }
+
+  async RemoveTaskFromDB(taskID) {
+    this.tasks = this.tasks.filter((task) => task.id != taskID);
+    await Item.destroy({
+      where: {
+        id: taskID,
+      },
     });
   }
 
-  removeAllTasks() {
+  async RemoveAllTasksFromDB() {
     this.tasks = [];
-    this.saveTasksToFile();
-  }
-
-  saveTasksToFile() {
-    fs.writeFileSync(
-      path.join(__dirname, this.tasksFile),
-      JSON.stringify(this.tasks)
-    );
+    //remove all the tasks from Item table
+    await Item.destroy({
+      where: {},
+      truncate: true,
+    });
   }
 
   saveResponseToCache(input, response) {
     const time = new Date().getTime();
-    const itemToSave = {
-      time: time,
-      input: input,
-      response: response,
-    };
     const cache = this.getCache();
-    cache.push(itemToSave);
+    cache[input] = response;
+    cache["time"] = time;
     fs.writeFileSync(
       path.join(__dirname, this.cacheFile),
       JSON.stringify(cache)
     );
   }
 
-  getTasks() {
-    const tasks = fs.readFileSync(path.join(__dirname, this.tasksFile));
-    return JSON.parse(tasks);
+  async getTasks() {
+    const itemsFromDB = await Item.findAll();
+    const tasks = [];
+    itemsFromDB.forEach((item) => {
+      tasks.push(item.dataValues);
+    });
+    this.tasks = tasks;
+    return tasks;
   }
 
   getCache() {
@@ -151,20 +168,8 @@ class ItemManager {
     return JSON.parse(cache);
   }
 
-  pushTaskFromReSort(id, taskContent, isCompleted) {
-    this.tasks.push({ id: id, content: taskContent, completed: isCompleted });
-    this.saveTasksToFile();
-  }
-
-  reSortTasks(HTMLTaskList) {
-    this.tasks = [];
-    HTMLTaskList.forEach((taskDiv) => {
-      const taskContent = taskDiv.querySelector("p").textContent;
-      const isCompleted = taskDiv.classList.contains("task-completed");
-      const taskID = taskDiv.getAttribute("id");
-      this.pushTaskFromReSort(taskID, taskContent, isCompleted);
-    });
-    this.saveTasksToFile();
+  reSortTasks(newSortedTasks) {
+    this.tasks = newSortedTasks;
   }
 }
 

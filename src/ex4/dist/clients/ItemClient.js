@@ -1,17 +1,17 @@
-export class ItemManager {
+export class ItemClient {
   constructor() {
-    this.serverURL = "http://localhost:8080/tasks/";
+    this.serverURL = "/tasks/";
+    this.tasks = [];
   }
 
-  async getTasksLength() {
-    const response = await fetch(this.serverURL + "length", { mode: "cors" });
-    const data = await response.json();
-    return data.length;
+  getTasksLength() {
+    return this.tasks.length;
   }
 
   async fetchTasks() {
     const response = await fetch(this.serverURL);
     const tasks = await response.json();
+    this.tasks = tasks;
     return tasks;
   }
 
@@ -22,8 +22,8 @@ export class ItemManager {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        content: taskInput,
-        isCompleted: isCompleted,
+        itemName: taskInput,
+        status: isCompleted,
       }),
     });
     if (response.status === 200) {
@@ -47,14 +47,9 @@ export class ItemManager {
       method: "PUT",
     });
     if (response.status === 200) {
-      const task = await response.json();
-      this.tasks = this.tasks.map((task) => {
-        if (task.id === taskID) {
-          return task;
-        }
-        return task;
-      });
+      return true;
     }
+    return false;
   }
 
   async removeAllTasks() {
@@ -67,5 +62,28 @@ export class ItemManager {
     return false;
   }
 
-  async reSortTasks() {}
+  pushTaskFromReSort(id, taskContent, isCompleted) {
+    this.tasks.push({ id: id, itemName: taskContent, status: isCompleted });
+  }
+
+  async putResort(tasks) {
+    await fetch("/resort", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(tasks),
+    });
+  }
+
+  async reSortTasks(HTMLTaskList) {
+    this.tasks = [];
+    HTMLTaskList.forEach((taskDiv) => {
+      const taskContent = taskDiv.querySelector("p").textContent;
+      const isCompleted = taskDiv.classList.contains("task-completed");
+      const taskID = taskDiv.getAttribute("id");
+      this.pushTaskFromReSort(taskID, taskContent, isCompleted);
+    });
+    await this.putResort(this.tasks);
+  }
 }
