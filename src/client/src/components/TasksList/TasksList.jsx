@@ -3,16 +3,22 @@ import PropTypes from "prop-types";
 import TaskItem from "../TaskItem/TaskItem";
 import ItemClient from "../../services/taskService";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import { setTasks } from "../../redux/reducers/taskSlice";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  updateTaskAsync,
+  removeTaskAsync,
+} from "../../redux/reducers/taskSlice";
 import "./taskList.css";
 
 const TasksList = ({
-  tasks,
-  setTasks,
   setEditTask,
   searchInput,
   statusFilter,
   setPresentedTasksNum,
 }) => {
+  const dispatch = useDispatch();
+  const tasks = useSelector((state) => state.tasks);
   const [filteredTasks, setFilteredTasks] = useState([]);
   const taskService = new ItemClient();
 
@@ -44,24 +50,19 @@ const TasksList = ({
   }, [tasks, searchInput, statusFilter]);
 
   const handleDelete = async (task) => {
-    setTasks(tasks.filter((t) => t.id !== task.id));
-    await taskService.removeTask(task.id);
+    dispatch(removeTaskAsync(task.id));
   };
 
   const handleComplete = async (task) => {
-    const taskToUpdate = tasks.find((t) => t.id === task.id);
-    taskToUpdate.status = !taskToUpdate.status;
-    const isToggled = await taskService.updateTask(taskToUpdate);
-    if (isToggled) {
-      setTasks([...tasks]);
-    }
+    console.log(task);
+    await dispatch(updateTaskAsync(task));
   };
 
   const handleOnDragEnd = async (result) => {
     const items = [...tasks];
     const [removed] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, removed);
-    setTasks(items);
+    dispatch(setTasks(items));
     await taskService.updateTaskOrder(items);
   };
 
@@ -108,8 +109,6 @@ const TasksList = ({
 };
 
 TasksList.propTypes = {
-  tasks: PropTypes.array.isRequired,
-  setTasks: PropTypes.func.isRequired,
   setEditTask: PropTypes.func.isRequired,
   searchInput: PropTypes.string.isRequired,
   statusFilter: PropTypes.string.isRequired,

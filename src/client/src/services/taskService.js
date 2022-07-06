@@ -3,11 +3,23 @@ class ItemClient {
     this.serverURL = "http://localhost:3042/tasks/";
   }
 
+  compare = (a, b) => {
+    if (a.position < b.position) {
+      return -1;
+    }
+    if (a.position > b.position) {
+      return 1;
+    }
+    return 0;
+  };
+
   async fetchTasks() {
     const response = await fetch(this.serverURL);
     const tasks = await response.json();
-    this.tasks = tasks;
-    return tasks;
+    if (response.status === 200) {
+      return tasks.sort(this.compare);
+    }
+    return [];
   }
 
   async addTask(taskInput, isCompleted, position) {

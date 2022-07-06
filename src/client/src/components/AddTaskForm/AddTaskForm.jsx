@@ -1,18 +1,22 @@
 import React, { useEffect, useState } from "react";
 import PropTypes from "prop-types";
 import ItemClient from "../../services/taskService";
+import { addTask, setTasks } from "../../redux/reducers/taskSlice";
+import { addTaskAsync } from "../../redux/reducers/taskSlice";
+import { useDispatch, useSelector } from "react-redux";
 
 import "./addTaskForm.css";
 
 const AddTaskForm = ({
-  tasks,
-  setTasks,
   editTask,
   setEditTask,
   setErrorMessage,
   setIsErrorShown,
 }) => {
   const [input, setInput] = useState("");
+
+  const dispatch = useDispatch();
+  const tasks = useSelector((state) => state.tasks);
 
   const taskService = new ItemClient();
   let iconClassName;
@@ -38,14 +42,17 @@ const AddTaskForm = ({
     taskToEdit.itemName = input;
     taskToEdit.status = status;
     const isEdited = await taskService.updateTask(taskToEdit);
+
     if (isEdited) {
-      setTasks(
-        tasks.map((task) => {
-          if (task.id === id) {
-            return taskToEdit;
-          }
-          return task;
-        })
+      dispatch(
+        setTasks(
+          tasks.map((task) => {
+            if (task.id === id) {
+              return taskToEdit;
+            }
+            return task;
+          })
+        )
       );
       setEditTask(null);
     } else {
@@ -64,22 +71,12 @@ const AddTaskForm = ({
     if (editTask) {
       updateTask(input, editTask.id, editTask.itemName, editTask.status);
     } else {
-      if (input.trim()) {
-        const position = tasks.length;
-        const res = await taskService.addTask(input, false, position);
-        if (res.status === 200) {
-          if (Array.isArray(res.response)) {
-            setTasks([...tasks, ...res.response]);
-          } else {
-            setTasks([...tasks, res.response]);
-          }
-        } else {
-          if (res.status === 409) {
-            setErrorMessage("Task already exists");
-            setIsErrorShown(true);
-          }
-        }
-      }
+      const newTask = {
+        input: input,
+        status: false,
+        position: tasks.length,
+      };
+      await dispatch(addTaskAsync(newTask));
     }
     setInput("");
   };
@@ -102,8 +99,6 @@ const AddTaskForm = ({
 };
 
 AddTaskForm.propTypes = {
-  tasks: PropTypes.array.isRequired,
-  setTasks: PropTypes.func.isRequired,
   editTask: PropTypes.object,
   setEditTask: PropTypes.func.isRequired,
 };

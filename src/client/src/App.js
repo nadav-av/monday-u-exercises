@@ -5,28 +5,19 @@ import Navbar from "./components/Navbar/Navbar";
 import Tasks from "./pages/Tasks/Tasks";
 import About from "./pages/About/About";
 import Statistics from "./pages/Statistics/Statistics";
-
+import { useDispatch, useSelector } from "react-redux";
+import { getTasksAsync } from "./redux/reducers/taskSlice";
 import "./App.css";
 
-const App = () => {
-  const [tasks, setTasks] = useState([]);
-  const taskService = new ItemClient();
 
-  const compare = (a, b) => {
-    if (a.position < b.position) {
-      return -1;
-    }
-    if (a.position > b.position) {
-      return 1;
-    }
-    return 0;
-  };
+const App = () => {
+  const taskService = new ItemClient();
+  const dispatch = useDispatch();
+  const tasks = useSelector((state) => state.tasks);
 
   useEffect(() => {
-    taskService.fetchTasks().then((tasks) => {
-      setTasks(tasks.sort(compare));
-    });
-  }, []);
+    dispatch(getTasksAsync());
+  }, [dispatch]);
 
   return (
     <React.Fragment>
@@ -39,8 +30,6 @@ const App = () => {
               path="/tasks"
               element={
                 <Tasks
-                  tasks={tasks}
-                  setTasks={setTasks}
                   taskService={taskService}
                 />
               }
@@ -53,8 +42,6 @@ const App = () => {
               path="*"
               element={
                 <Tasks
-                  tasks={tasks}
-                  setTasks={setTasks}
                   taskService={taskService}
                 />
               }
