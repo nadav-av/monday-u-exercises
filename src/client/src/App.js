@@ -35,6 +35,7 @@ const App = () => {
         <Navbar />
         <div className="container">
           <Routes>
+            <Route path="/" element={<Tasks tasks={tasks} exact />} />
             <Route path="/about" element={<About />} exact />
             <Route
               path="/tasks"
@@ -50,7 +51,6 @@ const App = () => {
               path="/statistics"
               element={<Statistics tasks={tasks} exact />}
             />
-            {/* add not found page */}
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

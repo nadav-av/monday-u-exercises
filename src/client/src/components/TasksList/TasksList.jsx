@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import TaskItem from "../TaskItem/TaskItem";
 import ItemClient from "../../services/taskService";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import { COMPLETED, UNCOMPLETED } from "../../services/globalConsts";
 import "./taskList.css";
 
 const TasksList = ({
@@ -24,12 +25,12 @@ const TasksList = ({
     let statusFilteredTasks = [];
 
     switch (statusFilter) {
-      case "completed":
+      case COMPLETED:
         statusFilteredTasks = searchFilteredTasks.filter(
           (task) => task.status === true
         );
         break;
-      case "uncompleted":
+      case UNCOMPLETED:
         statusFilteredTasks = searchFilteredTasks.filter(
           (task) => task.status === false
         );
@@ -44,8 +45,10 @@ const TasksList = ({
   }, [tasks, searchInput, statusFilter]);
 
   const handleDelete = async (task) => {
-    setTasks(tasks.filter((t) => t.id !== task.id));
-    await taskService.removeTask(task.id);
+    const isDeleted = await taskService.removeTask(task.id);
+    if (isDeleted) {
+      setTasks(tasks.filter((t) => t.id !== task.id));
+    }
   };
 
   const handleComplete = async (task) => {

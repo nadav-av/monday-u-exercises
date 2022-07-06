@@ -5,24 +5,20 @@ import TasksList from "../../components/TasksList/TasksList.jsx";
 import EmptyListNote from "../../components/EmptyListNote/EmptyListNote.jsx";
 import ActionBar from "../../components/ActionBar/ActionBar.jsx";
 import RemoveAllBtn from "../../components/RemoveAllButton/RemoveAllBtn.jsx";
+import { ALL } from "../../services/globalConsts";
 import { Toast } from "monday-ui-react-core";
 import "./tasks.css";
 
 const Tasks = ({ tasks, setTasks, taskService }) => {
   const [editTask, setEditTask] = useState(null);
   const [searchInput, setSearchInput] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState(ALL);
   const [presentedTasksNum, setPresentedTasksNum] = useState(0);
-  const [isErrorShown, setIsErrorShown] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleCloseError = () => {
-    setIsErrorShown(false);
-  };
-
   const handleRemoveAll = () => {
-    setTasks([]);
     taskService.removeAllTasks();
+    setTasks([]);
   };
 
   const showRemoveAllBtn = () => {
@@ -34,18 +30,15 @@ const Tasks = ({ tasks, setTasks, taskService }) => {
   return (
     <div className="container">
       <div className="app-wrapper">
-        {isErrorShown && (
-          <Toast
-            className="monday-storybook-toast_wrapper"
-            open
-            onClose={handleCloseError}
-            type={Toast.types.NEGATIVE}
-            autoHideDuration={5000}
-          >
-            {errorMessage}
-          </Toast>
-        )}
-
+        <Toast
+          className="monday-storybook-toast_wrapper"
+          open={errorMessage !== ""}
+          onClose={() => setErrorMessage("")}
+          type={Toast.types.NEGATIVE}
+          autoHideDuration={5000}
+        >
+          {errorMessage}
+        </Toast>
         <div>
           <Header headline="Tasks List" />
         </div>
@@ -53,7 +46,6 @@ const Tasks = ({ tasks, setTasks, taskService }) => {
         <ActionBar
           searchInput={searchInput}
           setSearchInput={setSearchInput}
-          filter={statusFilter}
           setFilter={setStatusFilter}
         ></ActionBar>
         <div>
@@ -63,7 +55,6 @@ const Tasks = ({ tasks, setTasks, taskService }) => {
             editTask={editTask}
             setEditTask={setEditTask}
             setErrorMessage={setErrorMessage}
-            setIsErrorShown={setIsErrorShown}
           />
         </div>
         {/* if taskslist empty show empty message */}

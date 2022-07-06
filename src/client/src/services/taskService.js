@@ -52,7 +52,7 @@ class ItemClient {
       }),
     });
     if (response.status === 200) {
-      return true;
+      return response;
     }
     return false;
   }

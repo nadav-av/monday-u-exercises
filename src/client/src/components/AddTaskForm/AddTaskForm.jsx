@@ -10,7 +10,6 @@ const AddTaskForm = ({
   editTask,
   setEditTask,
   setErrorMessage,
-  setIsErrorShown,
 }) => {
   const [input, setInput] = useState("");
 
@@ -33,7 +32,7 @@ const AddTaskForm = ({
     }
   };
 
-  const updateTask = async (input, id, itemName, status) => {
+  const updateTask = async (input, id, status) => {
     const taskToEdit = tasks.find((task) => task.id === id);
     taskToEdit.itemName = input;
     taskToEdit.status = status;
@@ -49,20 +48,19 @@ const AddTaskForm = ({
       );
       setEditTask(null);
     } else {
-      alert("Error updating task");
+      setErrorMessage("Error updating task");
     }
   };
 
   const onFormSubmit = async (e) => {
     e.preventDefault();
-    setIsErrorShown(false);
+    setErrorMessage("");
     if (input.length === 0) {
       setErrorMessage("Cannot add an empy task");
-      setIsErrorShown(true);
       return;
     }
     if (editTask) {
-      updateTask(input, editTask.id, editTask.itemName, editTask.status);
+      updateTask(input, editTask.id, editTask.status);
     } else {
       if (input.trim()) {
         const position = tasks.length;
@@ -72,7 +70,6 @@ const AddTaskForm = ({
         } else {
           if (res.status === 409) {
             setErrorMessage("Task already exists");
-            setIsErrorShown(true);
           }
         }
       }
