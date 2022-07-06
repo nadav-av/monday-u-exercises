@@ -1,0 +1,51 @@
+.actions
+{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 2rem;
+}
+
+
+.selectDrop
+{
+    z-index: 100;
+    width: 8rem;
+
+}
+
+.selectDrop .control .ValueContainer .placeholder
+{
+    color: blue
+}
+
+
+
+.search i {
+    position: absolute;
+    margin-top: 0.2rem;
+    color: #666
+}
+ 
+
+.search-icon {
+    padding: 10px;
+    min-width: 1.5rem;
+    margin-left: 1rem;
+}
+ 
+.search-input {
+    padding: 0.4rem;
+    font-size: 1.2rem;
+    border: none;
+    margin-right: 25px;
+    margin-left: 15px;
+    width: 260px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.46);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(13.9px);
+    -webkit-backdrop-filter: blur(13.9px);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+}

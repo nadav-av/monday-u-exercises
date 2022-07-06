@@ -13,17 +13,28 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   const taskInput = req.body.itemName;
   const isCompleted = req.body.status;
-  const isAdded = await itemManager.addTask(taskInput, isCompleted);
-  if (isAdded) {
-    res.status(200).json(req.body);
+  const position = req.body.position;
+  const response = await itemManager.addTask(taskInput, isCompleted, position);
+  if (response) {
+    res.status(200).json(response);
   } else {
     res.status(409).json({ error: "Task already exists" });
   }
 });
 
+router.put("/resort", (req, res) => {
+  const sorted = itemManager.reSortTasks(req.body);
+  if (sorted) {
+    res.status(200).json({ message: "Tasks was resorted" });
+  } else {
+    res.status(500).json({ error: "Error" });
+  }
+});
+
 router.put("/:id", async (req, res) => {
-  const taskID = req.params.id;
-  const isUpdated = await itemManager.toggleCompleted(taskID);
+  const id = req.params.id;
+  const updatedContent = req.body;
+  const isUpdated = await itemManager.updateTask(id, updatedContent);
   if (isUpdated) {
     res.status(200).json(req.body);
   } else {

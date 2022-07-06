@@ -21,17 +21,28 @@ class ItemManager {
     return regex.test(input);
   }
 
-  async addTask(taskInput, isCompleted) {
+  isRequestAdded(res) {
+    if (Array.isArray(res)) {
+      if (res.length === 0) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  async addTask(taskInput, isCompleted, position) {
     if (
       this.isInputSetOfPokemonIDs(taskInput) ||
       this.pokedex.isPokemonNamesOnly(taskInput)
     ) {
-      const res = await this.addCatchPokemonTask(taskInput);
-
-      return res;
+      const res = await this.addCatchPokemonTask(taskInput, position);
+      if (this.isRequestAdded(res)) {
+        return res;
+      }
+      return false;
     } else {
-      const isAdded = await this.addTaskToFile(taskInput, isCompleted);
-      return isAdded;
+      const res = await this.addTaskToFile(taskInput, isCompleted, position);
+      return res;
     }
   }
 
@@ -43,19 +54,28 @@ class ItemManager {
     return null;
   }
 
-  async addCatchPokemonTask(input) {
+  async addCatchPokemonTask(input, position) {
     let response = null;
     if ((response = this.getResponseFromCache(input))) {
-      await this.addResponsesToTasks(input, response, true);
-      return response;
+      const res = await this.addResponsesToTasks(
+        input,
+        response,
+        true,
+        position
+      );
+      return res;
     } else {
       response = await this.getPokemonsToAdd(input);
       if (response === false) {
         return false;
       } else {
-        const res = await this.addResponsesToTasks(input, response, false);
-
-        return true;
+        const res = await this.addResponsesToTasks(
+          input,
+          response,
+          false,
+          position
+        );
+        return res;
       }
     }
   }
@@ -67,18 +87,22 @@ class ItemManager {
     } else return response;
   }
 
-  async addResponsesToTasks(input, response, isFromCache) {
+  async addResponsesToTasks(input, response, isFromCache, position) {
+    const res = [];
     if (!isFromCache) {
       this.saveResponseToCache(input, response);
     }
 
     for (const pokemon of response) {
-      await this.addTaskToFile(pokemon, false);
+      const item = await this.addTaskToFile(pokemon, false, position);
+      if (item) {
+        res.push(item);
+      }
     }
-    return true;
+    return res;
   }
 
-  async addTaskToFile(taskInput, isCompleted) {
+  async addTaskToFile(taskInput, isCompleted, position) {
     const isTaskExist = this.tasks.find((task) => task.itemName === taskInput);
     if (isTaskExist) {
       return false;
@@ -87,41 +111,57 @@ class ItemManager {
         itemName: taskInput,
         status: isCompleted,
         doneAt: null,
+        position: position,
       };
-      this.tasks.push(task);
       return await this.saveTaskToDB(task);
     }
   }
 
-  async toggleCompleted(id) {
-    const task = this.tasks.find((task) => {
-      return task.id == id;
-    });
-
+  async updateTask(taskID, taskToUpdate) {
+    const task = this.tasks.find((task) => task.id == taskID);
     if (task) {
-      if (task.status)
+      if (task.status === false && taskToUpdate.status === true) {
+        task.doneAt = new Date();
         await Item.update(
-          { status: !task.status, doneAt: null },
-          { where: { id: task.id } }
+          {
+            itemName: taskToUpdate.itemName,
+            status: taskToUpdate.status,
+            doneAt: new Date(),
+          },
+          { where: { id: taskID } }
         );
-      else
+      } else if (task.status === true && taskToUpdate.status === false) {
+        task.doneAt = null;
         await Item.update(
-          { status: !task.status, doneAt: new Date() },
-          { where: { id: task.id } }
+          {
+            itemName: taskToUpdate.itemName,
+            status: taskToUpdate.status,
+            doneAt: null,
+          },
+          { where: { id: taskID } }
         );
-      task.status = !task.status;
+      } else {
+        await Item.update(
+          { itemName: taskToUpdate.itemName, status: taskToUpdate.status },
+          { where: { id: taskID } }
+        );
+      }
+      task.itemName = taskToUpdate.itemName;
+      task.status = taskToUpdate.status;
       return task;
     }
   }
 
   async saveTaskToDB(task) {
+    let item;
     try {
-      await Item.create(task);
+      item = await Item.create(task);
     } catch (err) {
       console.log(err);
       return false;
     }
-    return true;
+    this.tasks.push(item.dataValues);
+    return item.dataValues;
   }
 
   async RemoveTaskFromDB(taskID) {
@@ -168,9 +208,20 @@ class ItemManager {
     return JSON.parse(cache);
   }
 
-  reSortTasks(newSortedTasks) {
-    this.tasks = newSortedTasks;
+  async reSortTasks(newSortedTasks) {
+    try {
+      for (let i = 0; i < newSortedTasks.length; i++) {
+        const task = newSortedTasks[i];
+        await Item.update({ position: i }, { where: { id: task.id } });
+      }
+      return true;
+    } catch (err) {
+      console.log(err);
+      return false;
+    }
   }
 }
 
-module.exports = new ItemManager();
+const itemManager = new ItemManager();
+itemManager.getTasks();
+module.exports = itemManager;

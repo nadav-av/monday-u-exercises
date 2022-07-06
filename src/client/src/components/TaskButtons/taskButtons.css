@@ -1,0 +1,27 @@
+
+
+  .button-complete, .button-delete, .button-edit
+{
+  border: none;
+  outline: none;
+  background-color: transparent;
+  font-size: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+}
+
+
+.button-complete{
+  color: #00ba37;
+  margin-right: 10px;
+}
+
+.button-edit
+{
+  color: #97D9E1;
+  margin-right: 10px;
+}
+
+.button-delete{
+  color: #FF0000;
+}
