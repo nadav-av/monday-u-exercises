@@ -5,6 +5,7 @@ import Navbar from "./components/Navbar/Navbar";
 import Tasks from "./pages/Tasks/Tasks";
 import About from "./pages/About/About";
 import Statistics from "./pages/Statistics/Statistics";
+import NotFound from "./pages/NotFound/NotFound";
 
 import "./App.css";
 
@@ -49,16 +50,8 @@ const App = () => {
               path="/statistics"
               element={<Statistics tasks={tasks} exact />}
             />
-            <Route
-              path="*"
-              element={
-                <Tasks
-                  tasks={tasks}
-                  setTasks={setTasks}
-                  taskService={taskService}
-                />
-              }
-            />
+            {/* add not found page */}
+            <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
       </div>

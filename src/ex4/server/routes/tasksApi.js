@@ -22,9 +22,11 @@ router.get("/", async (req, res) => {
 
 //add new task to tasks.json file
 router.post("/", async (req, res) => {
-  const taskInput = req.body.itemName;
-  const isCompleted = req.body.status;
-  const position = req.body.position;
+  const {
+    itemName: taskInput,
+    status: isCompleted,
+    position: position,
+  } = req.body;
   const response = await tasksManager.addTask(taskInput, isCompleted, position);
   if (response.error) {
     if (response.error === ERR_W_ADD_TO_DB) {
@@ -38,7 +40,8 @@ router.post("/", async (req, res) => {
 });
 
 router.put("/resort", (req, res) => {
-  const sorted = tasksManager.reSortTasks(req.body);
+  const { tasks } = req.body;
+  const sorted = tasksManager.reSortTasks(tasks);
   if (sorted) {
     res.status(200).json({ message: "Tasks was resorted" });
   } else {
