@@ -7,9 +7,14 @@ import ActionBar from "../../components/ActionBar/ActionBar.jsx";
 import RemoveAllBtn from "../../components/RemoveAllButton/RemoveAllBtn.jsx";
 import { ALL } from "../../services/globalConsts";
 import { Toast } from "monday-ui-react-core";
+import { connect } from "react-redux";
+import { getTasks } from "../../redux/selectors/tasksSelector";
+import { bindActionCreators } from "redux";
+import { removeAllTasksAction } from "../../redux/actions/tasks_actions";
+
 import "./tasks.css";
 
-const Tasks = ({ tasks, setTasks, taskService }) => {
+const Tasks = ({ tasks, removeAllTasksAction }) => {
   const [editTask, setEditTask] = useState(null);
   const [searchInput, setSearchInput] = useState("");
   const [statusFilter, setStatusFilter] = useState(ALL);
@@ -17,8 +22,7 @@ const Tasks = ({ tasks, setTasks, taskService }) => {
   const [errorMessage, setErrorMessage] = useState("");
 
   const handleRemoveAll = () => {
-    taskService.removeAllTasks();
-    setTasks([]);
+    this.props.removeAllTasks();
   };
 
   const showRemoveAllBtn = () => {
@@ -50,8 +54,6 @@ const Tasks = ({ tasks, setTasks, taskService }) => {
         ></ActionBar>
         <div>
           <AddTaskForm
-            tasks={tasks}
-            setTasks={setTasks}
             editTask={editTask}
             setEditTask={setEditTask}
             setErrorMessage={setErrorMessage}
@@ -63,10 +65,8 @@ const Tasks = ({ tasks, setTasks, taskService }) => {
         ) : (
           <div>
             <TasksList
-              tasks={tasks}
               statusFilter={statusFilter}
               searchInput={searchInput}
-              setTasks={setTasks}
               setEditTask={setEditTask}
               setPresentedTasksNum={setPresentedTasksNum}
             />
@@ -78,4 +78,13 @@ const Tasks = ({ tasks, setTasks, taskService }) => {
   );
 };
 
-export default Tasks;
+const mapStateToProps = (state, ownProps) => {
+  const tasks = getTasks(state);
+  return { tasks };
+};
+
+const mapDispatchToProps = (dispatch, ownProps) => {
+  return bindActionCreators({ removeAllTasksAction }, dispatch);
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Tasks);

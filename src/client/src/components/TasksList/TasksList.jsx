@@ -4,11 +4,22 @@ import TaskItem from "../TaskItem/TaskItem";
 import ItemClient from "../../services/taskService";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { COMPLETED, UNCOMPLETED } from "../../services/globalConsts";
+import { connect } from "react-redux";
+import { getTasks } from "../../redux/selectors/tasksSelector";
+import actionTypes from "../../redux/constans";
 import "./taskList.css";
+import {
+  removeTaskAction,
+  setTasksAction,
+  updateTaskAction,
+} from "./../../redux/actions/tasks_actions";
+import { bindActionCreators } from "redux";
 
 const TasksList = ({
   tasks,
-  setTasks,
+  removeTaskAction,
+  setTasksAction,
+  updateTaskAction,
   setEditTask,
   searchInput,
   statusFilter,
@@ -47,16 +58,16 @@ const TasksList = ({
   const handleDelete = async (task) => {
     const isDeleted = await taskService.removeTask(task.id);
     if (isDeleted) {
-      setTasks(tasks.filter((t) => t.id !== task.id));
+      removeTaskAction(isDeleted.id);
     }
   };
 
   const handleComplete = async (task) => {
     const taskToUpdate = tasks.find((t) => t.id === task.id);
     taskToUpdate.status = !taskToUpdate.status;
-    const isToggled = await taskService.updateTask(taskToUpdate);
-    if (isToggled) {
-      setTasks([...tasks]);
+    const updatedTask = await taskService.updateTask(taskToUpdate);
+    if (updatedTask) {
+      updateTaskAction(taskToUpdate);
     }
   };
 
@@ -64,7 +75,7 @@ const TasksList = ({
     const items = [...tasks];
     const [removed] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, removed);
-    setTasks(items);
+    setTasksAction(items);
     await taskService.updateTaskOrder(items);
   };
 
@@ -111,12 +122,22 @@ const TasksList = ({
 };
 
 TasksList.propTypes = {
-  tasks: PropTypes.array.isRequired,
-  setTasks: PropTypes.func.isRequired,
   setEditTask: PropTypes.func.isRequired,
   searchInput: PropTypes.string.isRequired,
   statusFilter: PropTypes.string.isRequired,
   setPresentedTasksNum: PropTypes.func.isRequired,
 };
 
-export default TasksList;
+const mapStateToProps = (state, ownProps) => {
+  const tasks = getTasks(state);
+  return { tasks };
+};
+
+const mapDispatchToProps = (dispatch, ownProps) => {
+  return bindActionCreators(
+    { updateTaskAction, setTasksAction, removeTaskAction },
+    dispatch
+  );
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(TasksList);

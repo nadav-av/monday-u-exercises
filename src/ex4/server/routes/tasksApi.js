@@ -22,6 +22,7 @@ router.get("/", async (req, res) => {
 
 //add new task to tasks.json file
 router.post("/", async (req, res) => {
+  console.log(req.body);
   const {
     itemName: taskInput,
     status: isCompleted,
@@ -64,7 +65,6 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-//remove task from tasks.json file
 router.delete("/:id", async (req, res) => {
   const taskID = req.params.id;
   const response = await tasksManager.RemoveTaskFromDB(taskID);

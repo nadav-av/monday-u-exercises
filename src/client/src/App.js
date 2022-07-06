@@ -7,12 +7,11 @@ import About from "./pages/About/About";
 import Statistics from "./pages/Statistics/Statistics";
 import NotFound from "./pages/NotFound/NotFound";
 
+
 import "./App.css";
 
-const App = () => {
-  const [tasks, setTasks] = useState([]);
-  const taskService = new ItemClient();
 
+const App = () => {
   const compare = (a, b) => {
     if (a.position < b.position) {
       return -1;
@@ -23,11 +22,7 @@ const App = () => {
     return 0;
   };
 
-  useEffect(() => {
-    taskService.fetchTasks().then((tasks) => {
-      setTasks(tasks.sort(compare));
-    });
-  }, []);
+  useEffect(() => {}, []);
 
   return (
     <React.Fragment>
@@ -35,22 +30,10 @@ const App = () => {
         <Navbar />
         <div className="container">
           <Routes>
-            <Route path="/" element={<Tasks tasks={tasks} exact />} />
+            <Route path="/" element={<Tasks exact />} />
             <Route path="/about" element={<About />} exact />
-            <Route
-              path="/tasks"
-              element={
-                <Tasks
-                  tasks={tasks}
-                  setTasks={setTasks}
-                  taskService={taskService}
-                />
-              }
-            />
-            <Route
-              path="/statistics"
-              element={<Statistics tasks={tasks} exact />}
-            />
+            <Route path="/tasks" element={<Tasks />} />
+            <Route path="/statistics" element={<Statistics exact />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>

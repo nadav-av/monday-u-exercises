@@ -11,6 +11,7 @@ class ItemClient {
   }
 
   async addTask(taskInput, isCompleted, position) {
+    console.log("addTask", taskInput, isCompleted, position);
     const response = await fetch(this.serverURL, {
       method: "POST",
       headers: {
