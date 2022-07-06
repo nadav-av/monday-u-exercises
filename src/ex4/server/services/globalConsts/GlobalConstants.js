@@ -5,7 +5,9 @@ const FAILED_TO_FETCH = "Failed to fetch pokemons";
 const ERR_W_ADD_TO_DB = "Error while adding task to DB";
 const ERR_W_GET_TASKS = "Error while getting tasks";
 const TASK_NOT_FOUND = "Task not found";
+const TASK_REMOVED = "Task removed";
 const ERR_W_DELETE_FROM_DB = "Error while deleting task from DB";
+const ERR_W_UPDATE_TASK = "Error while updating task";
 
 const FIVE_MIN = 300000;
 
@@ -19,4 +21,6 @@ module.exports = {
   ERR_W_GET_TASKS,
   TASK_NOT_FOUND,
   ERR_W_DELETE_FROM_DB,
+  TASK_REMOVED,
+  ERR_W_UPDATE_TASK,
 };

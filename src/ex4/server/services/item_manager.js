@@ -4,6 +4,7 @@ const {
   ERR_W_ADD_TO_DB,
   TASK_NOT_FOUND,
   ERR_W_GET_TASKS,
+  TASK_REMOVED,
 } = require("./globalConsts/GlobalConstants.js");
 const fs = require("fs");
 const PokemonClient = require("../clients/pokemon_client.js");
@@ -137,40 +138,36 @@ class ItemManager {
     }
   }
 
+  constructUpdatedTask(task, UpdatedTask) {
+    console.log(UpdatedTask);
+    if (task.status === false && UpdatedTask.status === true) {
+      task.doneAt = new Date();
+    } else if (task.status === true && UpdatedTask.status === false) {
+      task.doneAt = null;
+    }
+    task.status = UpdatedTask.status;
+    task.itemName = UpdatedTask.itemName;
+  }
+
   async updateTask(taskID, taskToUpdate) {
     const task = this.tasks.find((task) => task.id == taskID);
     if (!task) {
       return { error: TASK_NOT_FOUND, message: TASK_NOT_FOUND };
     }
-    if (task.status === false && taskToUpdate.status === true) {
-      task.doneAt = new Date();
+    this.constructUpdatedTask(task, taskToUpdate);
+    try {
       await Item.update(
         {
-          itemName: taskToUpdate.itemName,
-          status: taskToUpdate.status,
-          doneAt: new Date(),
+          itemName: task.itemName,
+          status: task.status,
+          doneAt: task.doneAt,
         },
         { where: { id: taskID } }
       );
-    } else if (task.status === true && taskToUpdate.status === false) {
-      task.doneAt = null;
-      await Item.update(
-        {
-          itemName: taskToUpdate.itemName,
-          status: taskToUpdate.status,
-          doneAt: null,
-        },
-        { where: { id: taskID } }
-      );
-    } else {
-      await Item.update(
-        { itemName: taskToUpdate.itemName, status: taskToUpdate.status },
-        { where: { id: taskID } }
-      );
+      return task;
+    } catch (err) {
+      return { error: err, message: ERR_W_UPDATE_TASK };
     }
-    task.itemName = taskToUpdate.itemName;
-    task.status = taskToUpdate.status;
-    return task;
   }
 
   isRequestAdded(res) {
@@ -183,17 +180,18 @@ class ItemManager {
   }
 
   async RemoveTaskFromDB(taskID) {
-    this.tasks = this.tasks.filter((task) => task.id != taskID);
-    const task = await Item.find({ where: { id: taskID } });
+    const task = this.tasks.find((task) => task.id == taskID);
     if (!task) {
       return { error: TASK_NOT_FOUND, message: TASK_NOT_FOUND };
     }
+    this.tasks = this.tasks.filter((task) => task.id != taskID);
     try {
       await Item.destroy({
         where: {
           id: taskID,
         },
       });
+      return { message: TASK_REMOVED };
     } catch (err) {
       return { error: err, message: ERR_W_DELETE_FROM_DB };
     }
@@ -201,12 +199,12 @@ class ItemManager {
 
   async RemoveAllTasksFromDB() {
     this.tasks = [];
-    //remove all the tasks from Item table
     try {
-      await Item.destroy({
+      const response = await Item.destroy({
         where: {},
         truncate: true,
       });
+      return { message: TASK_REMOVED };
     } catch (err) {
       return { error: err, message: ERR_W_DELETE_FROM_DB };
     }
