@@ -13,6 +13,7 @@ const App = () => {
   const taskService = new ItemClient();
 
   const compare = (a, b) => {
+    console.log("hi");
     if (a.position < b.position) {
       return -1;
     }
