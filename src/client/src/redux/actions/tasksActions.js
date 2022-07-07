@@ -1,5 +1,6 @@
-import actionTypes from "../constans";
+import actionTypes from "./tasksActionConstants";
 import ItemClient from "./../../services/taskService";
+import { setErrorMessageAction } from "./errorHandleActions";
 
 const itemService = new ItemClient();
 
@@ -24,7 +25,7 @@ export const addTaskAction = (input, position) => {
         dispatch(addTask(addedTasks.response[i]));
       }
     } else if (addedTasks.status === 400) {
-      //TODO: Need to post the toast message
+      dispatch(setErrorMessageAction(addedTasks.response));
     }
   };
 };
@@ -40,7 +41,7 @@ export const removeTaskAction = (id) => {
     if (removedTask) {
       dispatch(removeTask(id));
     } else {
-      //TODO: Need to post the toast message
+      dispatch(setErrorMessageAction("Error while removing task"));
     }
   };
 };
@@ -55,7 +56,7 @@ export const removeAllTasksAction = () => {
     if (isRemoved) {
       dispatch(removeAllTasks());
     } else {
-      //TODO: Need to post the toast message
+      dispatch(setErrorMessageAction("Error while removing all tasks"));
     }
   };
 };
@@ -71,7 +72,7 @@ export const updateTaskAction = (task) => {
     if (updatedTask) {
       dispatch(updateTask(task));
     } else {
-      //TODO: Need to post the toast message
+      dispatch(setErrorMessageAction("Error while updating task"));
     }
   };
 };
@@ -87,7 +88,7 @@ export const setTasksAction = (tasks) => {
     if (isUpdated) {
       dispatch(setTasks(tasks));
     } else {
-      //TODO: Need to post the toast message
+      dispatch(setErrorMessageAction("Error while updating task order"));
     }
   };
 };

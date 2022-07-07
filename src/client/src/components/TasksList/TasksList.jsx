@@ -78,7 +78,7 @@ const TasksList = ({
                       {...provided.dragHandleProps}
                       ref={provided.innerRef}
                     >
-                      <TaskItem task={task}/>
+                      <TaskItem task={task} />
                     </li>
                   )}
                 </Draggable>
@@ -93,9 +93,6 @@ const TasksList = ({
 };
 
 TasksList.propTypes = {
-  setEditTask: PropTypes.func.isRequired,
-  searchInput: PropTypes.string.isRequired,
-  statusFilter: PropTypes.string.isRequired,
   setPresentedTasksNum: PropTypes.func.isRequired,
 };
 

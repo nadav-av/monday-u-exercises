@@ -1,4 +1,4 @@
-import actionTypes from "../constans";
+import actionTypes from "../actions/tasksActionConstants";
 
 const initialState = {
   tasksArray: [],

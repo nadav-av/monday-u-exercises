@@ -3,8 +3,8 @@ import { getTasks } from "../../redux/selectors/tasksSelector";
 import {
   removeTaskAction,
   updateTaskAction,
-  setEditTaskAction
-} from "./../../redux/actions/tasks_actions";
+  setEditTaskAction,
+} from "./../../redux/actions/tasksActions";
 import { bindActionCreators } from "redux";
 import TaskItem from "./TaskItem";
 
@@ -14,7 +14,10 @@ const mapStateToProps = (state, ownProps) => {
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {
-  return bindActionCreators({ updateTaskAction, removeTaskAction, setEditTaskAction }, dispatch);
+  return bindActionCreators(
+    { updateTaskAction, removeTaskAction, setEditTaskAction },
+    dispatch
+  );
 };
 
 export default connect(mapStateToProps, mapDispatchToProps)(TaskItem);

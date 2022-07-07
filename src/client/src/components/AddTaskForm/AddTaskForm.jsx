@@ -1,15 +1,14 @@
 import React, { useCallback, useEffect, useState } from "react";
-import ItemClient from "../../services/taskService";
 
 import "./addTaskForm.css";
 
 const AddTaskForm = ({
   tasks,
+  editTask,
   addTaskAction,
   updateTaskAction,
-  editTask,
+  setErrorMessageAction,
   setEditTaskAction,
-  setErrorMessage,
 }) => {
   const addTask = useCallback(
     (input, position) => {
@@ -34,7 +33,6 @@ const AddTaskForm = ({
 
   const [input, setInput] = useState("");
 
-  const taskService = new ItemClient();
   let iconClassName;
 
   useEffect(() => {
@@ -53,17 +51,8 @@ const AddTaskForm = ({
     }
   };
 
-  const handleEditTask = async (input, id, status) => {
-    const taskToEdit = tasks.find((task) => task.id === id);
-    taskToEdit.itemName = input;
-    taskToEdit.status = status;
-    const isEdited = await taskService.updateTask(taskToEdit);
-    if (isEdited) {
-      updateTask(taskToEdit);
-      setEditTask(null);
-    } else {
-      setErrorMessage("Error updating task");
-    }
+  const setErrorMessage = (msg) => {
+    setErrorMessageAction(msg);
   };
 
   const onFormSubmit = async (e) => {
