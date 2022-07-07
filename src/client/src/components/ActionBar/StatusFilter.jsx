@@ -1,7 +1,9 @@
 import { Dropdown } from "monday-ui-react-core";
 import React from "react";
+import { ALL, COMPLETED, UNCOMPLETED } from "../../services/globalConsts";
+import "./statusFilter.css";
 
-const StatusFilter = ({ filter, setFilter }) => {
+const StatusFilter = ({ setFilter }) => {
   return (
     <Dropdown
       className="selectDrop"
@@ -9,15 +11,15 @@ const StatusFilter = ({ filter, setFilter }) => {
       options={[
         {
           label: "All",
-          value: "all",
+          value: ALL,
         },
         {
           label: "Completed",
-          value: "completed",
+          value: COMPLETED,
         },
         {
           label: "Uncompleted",
-          value: "uncompleted",
+          value: UNCOMPLETED,
         },
       ]}
       placeholder="filter"

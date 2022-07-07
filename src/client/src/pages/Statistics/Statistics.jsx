@@ -8,7 +8,7 @@ const Statistics = ({ tasks }) => {
   const completedTasks = tasks.filter((task) => task.status).length;
   const uncompletedTasks = totalTasks - completedTasks;
 
-  const avgTimeToComplete = () => {
+  const avgTimeToCompleteMemo = useMemo(() => {
     let delta = 0;
     if (completedTasks === 0) return "There are no completed tasks";
     tasks.forEach((task) => {
@@ -23,12 +23,7 @@ const Statistics = ({ tasks }) => {
     if (avgInHours < 0.5)
       return `Average time to complete: less than 30 minutes`;
     return `Average time to complete: ${avgInHours.toFixed(2)} hours`;
-  };
-
-  const avgTimeToCompleteMemo = useMemo(
-    () => avgTimeToComplete(),
-    [tasks, completedTasks]
-  );
+  }, [tasks, completedTasks]);
 
   return (
     <div className="container">

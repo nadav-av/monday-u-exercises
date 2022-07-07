@@ -3,11 +3,11 @@ import "./actionBar.css";
 import SearchBar from "./SearchBar";
 import StatusFilter from "./StatusFilter";
 
-const ActionBar = ({ searchInput, setSearchInput, filter, setFilter }) => {
+const ActionBar = ({ searchInput, setSearchInput, setFilter }) => {
   return (
     <div className="actions">
       <SearchBar searchInput={searchInput} setSearchInput={setSearchInput} />
-      <StatusFilter filter={filter} setFilter={setFilter} />
+      <StatusFilter setFilter={setFilter} />
     </div>
   );
 };

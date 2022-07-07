@@ -1,51 +1,66 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import Header from "../../components/Header/Header.jsx";
-import AddTaskForm from "../../components/AddTaskForm/AddTaskForm.jsx";
-import TasksList from "../../components/TasksList/TasksList.jsx";
+import TasksList from "../../components/TasksList/TaskListConnector";
 import EmptyListNote from "../../components/EmptyListNote/EmptyListNote.jsx";
 import ActionBar from "../../components/ActionBar/ActionBar.jsx";
 import RemoveAllBtn from "../../components/RemoveAllButton/RemoveAllBtn.jsx";
+import { ALL } from "../../services/globalConsts";
 import { Toast } from "monday-ui-react-core";
+import AddTasksForm from "../../components/AddTaskForm/AddTaskFormConnector";
+import ItemClient from "../../services/taskService";
+
 import "./tasks.css";
 
-const Tasks = ({ tasks, setTasks, taskService }) => {
+const Tasks = ({ tasks, removeAllTasksAction, setTasksAction }) => {
+  const compare = (a, b) => {
+    if (a.position < b.position) return -1;
+    if (a.position > b.position) return 1;
+    return 0;
+  };
+
+  useEffect(() => {
+    const itemService = new ItemClient();
+    const tasks = itemService.fetchTasks().then((tasks) => {
+      const sortedTasks = tasks.sort(compare);
+      setTasksAction(sortedTasks);
+    }, []);
+  });
+
   const [editTask, setEditTask] = useState(null);
   const [searchInput, setSearchInput] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+  const [statusFilter, setStatusFilter] = useState(ALL);
   const [presentedTasksNum, setPresentedTasksNum] = useState(0);
-  const [isErrorShown, setIsErrorShown] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
 
-  const handleCloseError = () => {
-    setIsErrorShown(false);
-  };
+  const setTasks = useCallback(
+    (tasks) => {
+      setTasksAction(tasks);
+    },
+    [setTasksAction]
+  );
 
-  const handleRemoveAll = () => {
-    setTasks([]);
-    taskService.removeAllTasks();
-  };
+  const removeAllTasks = useCallback(() => {
+    removeAllTasksAction();
+  }, [removeAllTasksAction]);
 
   const showRemoveAllBtn = () => {
     if (presentedTasksNum === tasks.length && tasks.length > 0) {
-      return <RemoveAllBtn handleRemoveAll={handleRemoveAll} />;
+      return <RemoveAllBtn handleRemoveAll={removeAllTasks} />;
     } else return null;
   };
 
   return (
     <div className="container">
       <div className="app-wrapper">
-        {isErrorShown && (
-          <Toast
-            className="monday-storybook-toast_wrapper"
-            open
-            onClose={handleCloseError}
-            type={Toast.types.NEGATIVE}
-            autoHideDuration={5000}
-          >
-            {errorMessage}
-          </Toast>
-        )}
-
+        <Toast
+          className="monday-storybook-toast_wrapper"
+          open={errorMessage !== ""}
+          onClose={() => setErrorMessage("")}
+          type={Toast.types.NEGATIVE}
+          autoHideDuration={5000}
+        >
+          {errorMessage}
+        </Toast>
         <div>
           <Header headline="Tasks List" />
         </div>
@@ -53,17 +68,13 @@ const Tasks = ({ tasks, setTasks, taskService }) => {
         <ActionBar
           searchInput={searchInput}
           setSearchInput={setSearchInput}
-          filter={statusFilter}
           setFilter={setStatusFilter}
         ></ActionBar>
         <div>
-          <AddTaskForm
-            tasks={tasks}
-            setTasks={setTasks}
+          <AddTasksForm
             editTask={editTask}
             setEditTask={setEditTask}
             setErrorMessage={setErrorMessage}
-            setIsErrorShown={setIsErrorShown}
           />
         </div>
         {/* if taskslist empty show empty message */}
@@ -72,10 +83,8 @@ const Tasks = ({ tasks, setTasks, taskService }) => {
         ) : (
           <div>
             <TasksList
-              tasks={tasks}
               statusFilter={statusFilter}
               searchInput={searchInput}
-              setTasks={setTasks}
               setEditTask={setEditTask}
               setPresentedTasksNum={setPresentedTasksNum}
             />

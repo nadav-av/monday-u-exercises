@@ -6,7 +6,6 @@ class ItemClient {
   async fetchTasks() {
     const response = await fetch(this.serverURL);
     const tasks = await response.json();
-    this.tasks = tasks;
     return tasks;
   }
 
@@ -52,7 +51,7 @@ class ItemClient {
       }),
     });
     if (response.status === 200) {
-      return true;
+      return response;
     }
     return false;
   }

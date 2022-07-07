@@ -75,10 +75,6 @@
     background: #ffdd40;
   }
   
-  .nav-item .active {
-    color: #ffdd40;
-    border: 1px solid #ffdd40;
-  }
   
   .nav-icon {
     display: none;
@@ -103,19 +99,7 @@
 
     }
 
-  
-    .nav-menu.active {
-      background: rgba(255, 255, 255, 0.53);
-      left: 0px;
-      opacity: 1;
-      transition: all 0.5s ease;
-      z-index: 1;
-    }
 
-    .nav-item .active {
-      color: #ffdd40;
-      border: none;
-    }
     .nav-links {
       padding: 1.5rem;
       width: 100%;

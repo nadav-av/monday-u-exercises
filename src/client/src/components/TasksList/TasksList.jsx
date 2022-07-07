@@ -1,18 +1,42 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import TaskItem from "../TaskItem/TaskItem";
 import ItemClient from "../../services/taskService";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
+import { COMPLETED, UNCOMPLETED } from "../../services/globalConsts";
 import "./taskList.css";
 
 const TasksList = ({
   tasks,
-  setTasks,
+  removeTaskAction,
+  setTasksAction,
+  updateTaskAction,
   setEditTask,
   searchInput,
   statusFilter,
   setPresentedTasksNum,
 }) => {
+  const removeTask = useCallback(
+    (id) => {
+      removeTaskAction(id);
+    },
+    [removeTaskAction]
+  );
+
+  const setTasks = useCallback(
+    (tasks) => {
+      setTasksAction(tasks);
+    },
+    [setTasksAction]
+  );
+
+  const updateTask = useCallback(
+    (task) => {
+      updateTaskAction(task);
+    },
+    [updateTaskAction]
+  );
+
   const [filteredTasks, setFilteredTasks] = useState([]);
   const taskService = new ItemClient();
 
@@ -24,12 +48,12 @@ const TasksList = ({
     let statusFilteredTasks = [];
 
     switch (statusFilter) {
-      case "completed":
+      case COMPLETED:
         statusFilteredTasks = searchFilteredTasks.filter(
           (task) => task.status === true
         );
         break;
-      case "uncompleted":
+      case UNCOMPLETED:
         statusFilteredTasks = searchFilteredTasks.filter(
           (task) => task.status === false
         );
@@ -44,16 +68,18 @@ const TasksList = ({
   }, [tasks, searchInput, statusFilter]);
 
   const handleDelete = async (task) => {
-    setTasks(tasks.filter((t) => t.id !== task.id));
-    await taskService.removeTask(task.id);
+    const isDeleted = await taskService.removeTask(task.id);
+    if (isDeleted) {
+      removeTask(isDeleted.id);
+    }
   };
 
   const handleComplete = async (task) => {
     const taskToUpdate = tasks.find((t) => t.id === task.id);
     taskToUpdate.status = !taskToUpdate.status;
-    const isToggled = await taskService.updateTask(taskToUpdate);
-    if (isToggled) {
-      setTasks([...tasks]);
+    const updatedTask = await taskService.updateTask(taskToUpdate);
+    if (updatedTask) {
+      updateTask(taskToUpdate);
     }
   };
 
@@ -108,8 +134,6 @@ const TasksList = ({
 };
 
 TasksList.propTypes = {
-  tasks: PropTypes.array.isRequired,
-  setTasks: PropTypes.func.isRequired,
   setEditTask: PropTypes.func.isRequired,
   searchInput: PropTypes.string.isRequired,
   statusFilter: PropTypes.string.isRequired,
