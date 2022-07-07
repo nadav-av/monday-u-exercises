@@ -7,37 +7,25 @@ import RemoveAllBtn from "../../components/RemoveAllButton/RemoveAllBtn.jsx";
 import { ALL } from "../../services/globalConsts";
 import { Toast } from "monday-ui-react-core";
 import AddTasksForm from "../../components/AddTaskForm/AddTaskFormConnector";
-import ItemClient from "../../services/taskService";
 
 import "./tasks.css";
 
-const Tasks = ({ tasks, removeAllTasksAction, setTasksAction }) => {
-  const compare = (a, b) => {
-    if (a.position < b.position) return -1;
-    if (a.position > b.position) return 1;
-    return 0;
-  };
+const Tasks = ({ tasks, removeAllTasksAction, getTasksAction }) => {
+
+
+  const getTasks = useCallback(() => {
+    getTasksAction();
+  }, [getTasksAction]);
 
   useEffect(() => {
-    const itemService = new ItemClient();
-    const tasks = itemService.fetchTasks().then((tasks) => {
-      const sortedTasks = tasks.sort(compare);
-      setTasksAction(sortedTasks);
-    }, []);
-  });
+    getTasks();
+  }, []);
 
   const [editTask, setEditTask] = useState(null);
   const [searchInput, setSearchInput] = useState("");
   const [statusFilter, setStatusFilter] = useState(ALL);
   const [presentedTasksNum, setPresentedTasksNum] = useState(0);
   const [errorMessage, setErrorMessage] = useState("");
-
-  const setTasks = useCallback(
-    (tasks) => {
-      setTasksAction(tasks);
-    },
-    [setTasksAction]
-  );
 
   const removeAllTasks = useCallback(() => {
     removeAllTasksAction();

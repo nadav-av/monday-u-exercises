@@ -4,6 +4,7 @@ const actions = {
   UPDATE_TASK: "UPDATE_TASK",
   REMOVE_ALL_TASKS: "REMOVE_ALL_TASKS",
   SET_TASKS: "SET_TASKS",
+  SET_EDIT_TASK: "SET_EDIT_TASK",
 };
 
 export default actions;

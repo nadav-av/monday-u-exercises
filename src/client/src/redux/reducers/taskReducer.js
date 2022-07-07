@@ -7,45 +7,48 @@ const initialState = {
 
 const tasksReducers = (state = initialState, action) => {
   switch (action.type) {
-    case actionTypes.ADD_TASK: {
-      const tasks = [...state.tasksArray];
-      const newTask = {
-        id: action.payload.id,
-        itemName: action.payload.itemName,
-        status: action.payload.status,
-        createdAt: action.payload.createdAt,
-        updatedAt: action.payload.updatedAt,
-        doneAt: action.payload.doneAt,
-        position: action.payload.position,
+    case actionTypes.ADD_TASK:
+      return {
+        ...state,
+        tasksArray: [...state.tasksArray, action.payload],
       };
-      tasks.push(newTask);
-      return { tasksArray: tasks };
-    }
 
-    case actionTypes.REMOVE_TASK: {
-      const tasks = [...state.tasksArray];
-      const taskToRemove = tasks.find((task) => task.id === action.payload);
-      const index = tasks.indexOf(taskToRemove);
-      tasks.splice(index, 1);
-      return { tasksArray: tasks };
-    }
+    case actionTypes.REMOVE_TASK:
+      return {
+        ...state,
+        tasksArray: state.tasksArray.filter(
+          (task) => task.id !== action.payload
+        ),
+      };
 
-    case actionTypes.UPDATE_TASK: {
-      const tasks = [...state.tasksArray];
-      const taskToUpdate = tasks.find((task) => task.id === action.payload.id);
-      const index = tasks.indexOf(taskToUpdate);
-      tasks[index] = action.payload;
-      return { tasksArray: tasks };
-    }
+    case actionTypes.UPDATE_TASK:
+      return {
+        ...state,
+        tasksArray: state.tasksArray.map((task) => {
+          if (task.id === action.payload.id) {
+            return action.payload;
+          }
+          return task;
+        }),
+      };
 
-    case actionTypes.REMOVE_ALL_TASKS: {
-      const tasks = [];
-      return { tasksArray: tasks };
-    }
+    case actionTypes.REMOVE_ALL_TASKS:
+      return {
+        ...state,
+        tasksArray: [],
+      };
 
-    case actionTypes.SET_TASKS: {
-      return { tasksArray: action.payload };
-    }
+    case actionTypes.SET_TASKS:
+      return {
+        ...state,
+        tasksArray: action.payload,
+      };
+
+    case actionTypes.SET_EDIT_TASK:
+      return {
+        ...state,
+        edittedTask: action.payload,
+      };
 
     default:
       return state;

@@ -1,5 +1,4 @@
 import React, { useCallback, useEffect, useState } from "react";
-import PropTypes from "prop-types";
 import ItemClient from "../../services/taskService";
 
 import "./addTaskForm.css";
@@ -9,12 +8,12 @@ const AddTaskForm = ({
   addTaskAction,
   updateTaskAction,
   editTask,
-  setEditTask,
+  setEditTaskAction,
   setErrorMessage,
 }) => {
   const addTask = useCallback(
-    (task) => {
-      addTaskAction(task);
+    (input, position) => {
+      addTaskAction(input, position);
     },
     [addTaskAction]
   );
@@ -24,6 +23,13 @@ const AddTaskForm = ({
       updateTaskAction(task);
     },
     [updateTaskAction]
+  );
+
+  const setEditTask = useCallback(
+    (task) => {
+      setEditTaskAction(task);
+    },
+    [setEditTaskAction]
   );
 
   const [input, setInput] = useState("");
@@ -68,21 +74,16 @@ const AddTaskForm = ({
       return;
     }
     if (editTask) {
-      handleEditTask(input, editTask.id, editTask.status);
+      const taskToEdit = tasks.find((task) => task.id === editTask.id);
+      taskToEdit.itemName = input;
+      updateTask(taskToEdit);
+      setEditTask(null);
+      setInput("");
     } else {
       if (input.trim()) {
         const position = tasks.length;
-        const addedTasks = await taskService.addTask(input, false, position);
-        if (addedTasks.status === 200) {
-          for (let i = 0; i < addedTasks.response.length; i++) {
-            addTask(addedTasks.response[i]);
-          }
-          setInput("");
-        } else {
-          if (addedTasks.status === 409) {
-            setErrorMessage("Task already exists");
-          }
-        }
+        addTask(input, position);
+        setInput("");
       }
     }
     setInput("");
@@ -103,11 +104,6 @@ const AddTaskForm = ({
       </button>
     </form>
   );
-};
-
-AddTaskForm.propTypes = {
-  editTask: PropTypes.object,
-  setEditTask: PropTypes.func.isRequired,
 };
 
 export default AddTaskForm;

@@ -5,8 +5,13 @@ class ItemClient {
 
   async fetchTasks() {
     const response = await fetch(this.serverURL);
-    const tasks = await response.json();
-    return tasks;
+    if (response.status === 200) {
+      const tasks = await response.json();
+      return tasks;
+    }
+    if (response.status === 500) {
+      return { error: "Server Error" };
+    }
   }
 
   async addTask(taskInput, isCompleted, position) {
