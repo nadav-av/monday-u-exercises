@@ -1,5 +1,5 @@
 import { connect } from "react-redux";
-import { getTasks } from "../../redux/selectors/tasksSelector";
+import { getTasks, getIsLoading } from "../../redux/selectors/tasksSelector";
 import {
   getErrorMsg,
   getIsErrorToastVisible,
@@ -19,7 +19,8 @@ const mapStateToProps = (state, ownProps) => {
   const tasks = getTasks(state);
   const errorMsg = getErrorMsg(state);
   const isErrorToastVisible = getIsErrorToastVisible(state);
-  return { tasks, errorMsg, isErrorToastVisible };
+  const isLoading = getIsLoading(state);
+  return { tasks, errorMsg, isErrorToastVisible, isLoading };
 };
 
 const mapDispatchToProps = (dispatch, ownProps) => {

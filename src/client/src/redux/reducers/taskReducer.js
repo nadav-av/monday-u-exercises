@@ -3,6 +3,7 @@ import actionTypes from "../actions/tasksActionConstants";
 const initialState = {
   tasksArray: [],
   edittedTask: null,
+  isLoading: false,
 };
 
 const tasksReducers = (state = initialState, action) => {
@@ -48,6 +49,12 @@ const tasksReducers = (state = initialState, action) => {
       return {
         ...state,
         edittedTask: action.payload,
+      };
+
+    case actionTypes.SET_IS_LOADING:
+      return {
+        ...state,
+        isLoading: action.payload,
       };
 
     default:

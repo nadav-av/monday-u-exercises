@@ -1,10 +1,11 @@
-  const actions = {
+const actions = {
   ADD_TASK: "ADD_TASK",
   REMOVE_TASK: "REMOVE_TASK",
   UPDATE_TASK: "UPDATE_TASK",
   REMOVE_ALL_TASKS: "REMOVE_ALL_TASKS",
   SET_TASKS: "SET_TASKS",
   SET_EDIT_TASK: "SET_EDIT_TASK",
+  SET_IS_LOADING: "SET_IS_LOADING",
 };
 
 export default actions;
