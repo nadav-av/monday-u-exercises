@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from "react";
+import UndoBtn from "./UndoBtnConnector";
 import { EMPTY_INPUT } from "../../services/globalConsts";
 import "./addTaskForm.css";
 
@@ -6,6 +7,7 @@ const AddTaskForm = ({
   tasks,
   editTask,
   isErrorToastVisible,
+  isTasksToRestoreExists,
   addTaskAction,
   updateTaskAction,
   setErrorMessageAction,
@@ -13,8 +15,8 @@ const AddTaskForm = ({
   setIsErrorToastVisibleAction,
 }) => {
   const addTask = useCallback(
-    (input, position) => {
-      addTaskAction(input, position);
+    (input, status, position) => {
+      addTaskAction(input, status, position);
     },
     [addTaskAction]
   );
@@ -95,7 +97,7 @@ const AddTaskForm = ({
       const trimmedInput = input.trim();
       if (trimmedInput) {
         const position = tasks.length;
-        addTask(trimmedInput, position);
+        addTask(trimmedInput, false, position);
       }
     }
     setInput("");
@@ -114,6 +116,7 @@ const AddTaskForm = ({
         {setButtonIcon()}
         <i className={iconClassName}></i>
       </button>
+      {isTasksToRestoreExists && <UndoBtn />}
     </form>
   );
 };

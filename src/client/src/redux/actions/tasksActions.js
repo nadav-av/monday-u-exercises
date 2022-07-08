@@ -10,16 +10,15 @@ import {
   ERROR_WHILE_REMOVE,
   ERROR_WHILE_UPDATE,
   ERROR_RESORT,
+  RESTORE_DELETED_TASK,
 } from "../../services/globalConsts";
-
 const itemService = new ItemClient();
 
 export const getTasksAction = () => {
   return async (dispatch) => {
     dispatch(setIsLoadingAction(true));
     const tasks = await itemService.fetchTasks();
-    const sortedTasks = tasks.sort((a, b) => a.position - b.position);
-    dispatch(setTasks(sortedTasks));
+    dispatch(setTasks(tasks));
     dispatch(setIsLoadingAction(false));
   };
 };
@@ -29,10 +28,10 @@ const addTask = (task) => ({
   payload: task,
 });
 
-export const addTaskAction = (input, position) => {
+export const addTaskAction = (input, status, position) => {
   return async (dispatch) => {
     dispatch(setIsLoadingAction(true));
-    const addedTasks = await itemService.addTask(input, false, position);
+    const addedTasks = await itemService.addTask(input, status, position);
     if (addedTasks.status === 200) {
       for (let i = 0; i < addedTasks.response.length; i++) {
         dispatch(addTask(addedTasks.response[i]));
@@ -137,5 +136,22 @@ const setIsLoading = (isLoading) => ({
 export const setIsLoadingAction = (isLoading) => {
   return (dispatch) => {
     dispatch(setIsLoading(isLoading));
+  };
+};
+
+const restoreDeletedTask = () => ({
+  type: actionTypes.RESTORE_DELETED_TASK,
+});
+
+export const restoreDeletedTaskAction = (taskToRestore) => {
+  return (dispatch) => {
+    dispatch(
+      addTaskAction(
+        taskToRestore.itemName,
+        taskToRestore.status,
+        taskToRestore.position
+      )
+    );
+    dispatch(restoreDeletedTask());
   };
 };

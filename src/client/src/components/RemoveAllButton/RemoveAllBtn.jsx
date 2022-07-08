@@ -1,13 +1,18 @@
-import React from "react";
+import React, { useCallback } from "react";
 import "./reomoveAllBtn.css";
 
-const RemoveAllBtn = ({ handleRemoveAll }) => {
+const RemoveAllBtn = ({ removeAllTasksAction }) => {
+  
+  const removeAllTasks = useCallback(() => {
+    removeAllTasksAction();
+  }, [removeAllTasksAction]);
+
   return (
     <div className="remove-all">
       <button
         className="btn remove-all-btn"
         type="button"
-        onClick={handleRemoveAll}
+        onClick={() => removeAllTasks()}
       >
         Remove all
       </button>

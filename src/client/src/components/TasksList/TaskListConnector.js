@@ -1,5 +1,5 @@
 import { connect } from "react-redux";
-import { getTasks } from "../../redux/selectors/tasksSelector";
+import { getTasks, getDeletedTasks } from "../../redux/selectors/tasksSelector";
 import {
   getFilter,
   getSearchInput,

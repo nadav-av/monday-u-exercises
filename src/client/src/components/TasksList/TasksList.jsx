@@ -49,9 +49,11 @@ const TasksList = ({
         statusFilteredTasks = searchFilteredTasks;
         break;
     }
-
-    setFilteredTasks(statusFilteredTasks);
-    setPresentedTasksNum(statusFilteredTasks.length);
+    const positionSortedTasks = statusFilteredTasks.sort((a, b) => {
+      return a.position - b.position;
+    });
+    setFilteredTasks(positionSortedTasks);
+    setPresentedTasksNum(positionSortedTasks.length);
   }, [tasks, debouncedSearchInput, statusFilter]);
 
   const handleOnDragEnd = async (result) => {

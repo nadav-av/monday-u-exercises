@@ -1,9 +1,13 @@
 import actionTypes from "../actions/tasksActionConstants";
 
+const DELETED_ARRAY_SIZE = 10;
+
 const initialState = {
   tasksArray: [],
   edittedTask: null,
   isLoading: false,
+  deletedTasksList: [],
+  isTasksToRestoreExsits: false,
 };
 
 const tasksReducers = (state = initialState, action) => {
@@ -14,13 +18,36 @@ const tasksReducers = (state = initialState, action) => {
         tasksArray: [...state.tasksArray, action.payload],
       };
 
-    case actionTypes.REMOVE_TASK:
+    case actionTypes.REMOVE_TASK: {
+      const taskToDelete = state.tasksArray.find(
+        (task) => task.id === action.payload
+      );
+      const deletedTasksList = [...state.deletedTasksList];
+      if (deletedTasksList.length === DELETED_ARRAY_SIZE) {
+        deletedTasksList.shift();
+      }
+      deletedTasksList.unshift(taskToDelete);
+
       return {
         ...state,
         tasksArray: state.tasksArray.filter(
           (task) => task.id !== action.payload
         ),
+        deletedTasksList: deletedTasksList,
+        isTasksToRestoreExsits: true,
       };
+    }
+
+    case actionTypes.RESTORE_DELETED_TASK: {
+      const deletedTasksList = [...state.deletedTasksList];
+      deletedTasksList.shift();
+      const isTasksToRestoreExsits = deletedTasksList.length > 0;
+      return {
+        ...state,
+        deletedTasksList: deletedTasksList,
+        isTasksToRestoreExsits: isTasksToRestoreExsits,
+      };
+    }
 
     case actionTypes.UPDATE_TASK:
       return {

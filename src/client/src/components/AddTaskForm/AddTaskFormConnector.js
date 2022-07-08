@@ -1,8 +1,18 @@
 import { bindActionCreators } from "redux";
 import { connect } from "react-redux";
-import { getTasks, getEditTask } from "../../redux/selectors/tasksSelector";
-import { getErrorMsg, getIsErrorToastVisible } from "../../redux/selectors/errorHandleSelector";
-import { setErrorMessageAction, setIsErrorToastVisibleAction } from "../../redux/actions/errorHandleActions";
+import {
+  getTasks,
+  getEditTask,
+  getIsTaskToRestoreExists,
+} from "../../redux/selectors/tasksSelector";
+import {
+  getErrorMsg,
+  getIsErrorToastVisible,
+} from "../../redux/selectors/errorHandleSelector";
+import {
+  setErrorMessageAction,
+  setIsErrorToastVisibleAction,
+} from "../../redux/actions/errorHandleActions";
 import {
   addTaskAction,
   updateTaskAction,
@@ -16,7 +26,14 @@ const mapStateToProps = (state, ownProps) => {
   const editTask = getEditTask(state);
   const errorMsg = getErrorMsg(state);
   const isErrorToastVisible = getIsErrorToastVisible(state);
-  return { tasks, editTask, errorMsg, isErrorToastVisible };
+  const isTasksToRestoreExists = getIsTaskToRestoreExists(state);
+  return {
+    tasks,
+    editTask,
+    errorMsg,
+    isErrorToastVisible,
+    isTasksToRestoreExists,
+  };
 };
 
 const mapDispatchToProps = (dispatch) => {
