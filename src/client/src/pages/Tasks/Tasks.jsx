@@ -12,19 +12,20 @@ import "./tasks.css";
 const Tasks = ({
   tasks,
   errorMsg,
+  isErrorToastVisible,
   removeAllTasksAction,
   getTasksAction,
-  setErrorMessageAction,
+  setIsErrorToastVisibleAction,
 }) => {
   const getTasks = useCallback(() => {
     getTasksAction();
   }, [getTasksAction]);
 
-  const setErrorMsg = useCallback(
-    (msg) => {
-      setErrorMessageAction(msg);
+  const setIsErrorVisable = useCallback(
+    (flag) => {
+      setIsErrorToastVisibleAction(flag);
     },
-    [setErrorMessageAction]
+    [setIsErrorToastVisibleAction]
   );
 
   useEffect(() => {
@@ -48,10 +49,11 @@ const Tasks = ({
       <div className="app-wrapper">
         <Toast
           className="monday-storybook-toast_wrapper"
-          open={errorMsg !== ""}
-          onClose={setErrorMsg("")}
+          open={isErrorToastVisible}
+          onClose={() => {
+            setIsErrorVisable(false);
+          }}
           type={Toast.types.NEGATIVE}
-          autoHideDuration={5000}
         >
           {errorMsg}
         </Toast>

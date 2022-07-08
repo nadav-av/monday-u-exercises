@@ -2,6 +2,7 @@ import actionTypes from "../actions/errorHandleConstants";
 
 const initialState = {
   errorMsg: "",
+  isErrorToastVisible: false,
 };
 
 const actionBarReducer = (state = initialState, action) => {
@@ -11,6 +12,13 @@ const actionBarReducer = (state = initialState, action) => {
         ...state,
         errorMsg: action.payload,
       };
+
+    case actionTypes.SET_IS_ERROR_TOAST_VISIBLE:
+      return {
+        ...state,
+        isErrorToastVisible: action.payload,
+      };
+
     default:
       return state;
   }

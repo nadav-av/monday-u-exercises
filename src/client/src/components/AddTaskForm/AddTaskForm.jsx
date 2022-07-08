@@ -1,14 +1,16 @@
 import React, { useCallback, useEffect, useState } from "react";
-
+import { EMPTY_INPUT } from "../../services/globalConsts";
 import "./addTaskForm.css";
 
 const AddTaskForm = ({
   tasks,
   editTask,
+  isErrorToastVisible,
   addTaskAction,
   updateTaskAction,
   setErrorMessageAction,
   setEditTaskAction,
+  setIsErrorToastVisibleAction,
 }) => {
   const addTask = useCallback(
     (input, position) => {
@@ -29,6 +31,13 @@ const AddTaskForm = ({
       setEditTaskAction(task);
     },
     [setEditTaskAction]
+  );
+
+  const setIsErrorToastVisible = useCallback(
+    (flag) => {
+      setIsErrorToastVisibleAction(flag);
+    },
+    [setIsErrorToastVisibleAction]
   );
 
   const [input, setInput] = useState("");
@@ -55,24 +64,38 @@ const AddTaskForm = ({
     setErrorMessageAction(msg);
   };
 
+  const isEmptyInputSubmitted = () => {
+    if (input.length === 0) {
+      setIsErrorToastVisible(true);
+      setErrorMessage(EMPTY_INPUT);
+      return true;
+    }
+  };
+
+  const handleEditTask = () => {
+    const taskToEdit = tasks.find((task) => task.id === editTask.id);
+    taskToEdit.itemName = input;
+    updateTask(taskToEdit);
+    setEditTask(null);
+  };
+
   const onFormSubmit = async (e) => {
     e.preventDefault();
-    setErrorMessage("");
-    if (input.length === 0) {
-      setErrorMessage("Cannot add an empy task");
+    if (isErrorToastVisible) {
+      setIsErrorToastVisible(false);
+    }
+    const isEmptyInput = isEmptyInputSubmitted();
+    if (isEmptyInput) {
       return;
     }
+
     if (editTask) {
-      const taskToEdit = tasks.find((task) => task.id === editTask.id);
-      taskToEdit.itemName = input;
-      updateTask(taskToEdit);
-      setEditTask(null);
-      setInput("");
+      handleEditTask();
     } else {
-      if (input.trim()) {
+      const trimmedInput = input.trim();
+      if (trimmedInput) {
         const position = tasks.length;
-        addTask(input, position);
-        setInput("");
+        addTask(trimmedInput, position);
       }
     }
     setInput("");

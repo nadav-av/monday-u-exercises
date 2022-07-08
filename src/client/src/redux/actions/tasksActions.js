@@ -1,6 +1,16 @@
 import actionTypes from "./tasksActionConstants";
 import ItemClient from "./../../services/taskService";
-import { setErrorMessageAction } from "./errorHandleActions";
+import {
+  setErrorMessageAction,
+  setIsErrorToastVisibleAction,
+} from "./errorHandleActions";
+import {
+  TASK_EXISTS,
+  ERROR_WHILE_REMOVE_ALL,
+  ERROR_WHILE_REMOVE,
+  ERROR_WHILE_UPDATE,
+  ERROR_RESORT,
+} from "../../services/globalConsts";
 
 const itemService = new ItemClient();
 
@@ -24,8 +34,9 @@ export const addTaskAction = (input, position) => {
       for (let i = 0; i < addedTasks.response.length; i++) {
         dispatch(addTask(addedTasks.response[i]));
       }
-    } else if (addedTasks.status === 400) {
-      dispatch(setErrorMessageAction(addedTasks.response));
+    } else if (addedTasks.status === 409) {
+      dispatch(setErrorMessageAction(TASK_EXISTS));
+      dispatch(setIsErrorToastVisibleAction(true));
     }
   };
 };
@@ -41,7 +52,8 @@ export const removeTaskAction = (id) => {
     if (removedTask) {
       dispatch(removeTask(id));
     } else {
-      dispatch(setErrorMessageAction("Error while removing task"));
+      dispatch(setIsErrorToastVisibleAction(true));
+      dispatch(setErrorMessageAction(ERROR_WHILE_REMOVE));
     }
   };
 };
@@ -56,7 +68,8 @@ export const removeAllTasksAction = () => {
     if (isRemoved) {
       dispatch(removeAllTasks());
     } else {
-      dispatch(setErrorMessageAction("Error while removing all tasks"));
+      dispatch(setIsErrorToastVisibleAction(true));
+      dispatch(setErrorMessageAction(ERROR_WHILE_REMOVE_ALL));
     }
   };
 };
@@ -72,7 +85,8 @@ export const updateTaskAction = (task) => {
     if (updatedTask) {
       dispatch(updateTask(task));
     } else {
-      dispatch(setErrorMessageAction("Error while updating task"));
+      dispatch(setIsErrorToastVisibleAction(true));
+      dispatch(setErrorMessageAction(ERROR_WHILE_UPDATE));
     }
   };
 };
@@ -88,7 +102,8 @@ export const setTasksAction = (tasks) => {
     if (isUpdated) {
       dispatch(setTasks(tasks));
     } else {
-      dispatch(setErrorMessageAction("Error while updating task order"));
+      dispatch(setIsErrorToastVisibleAction(true));
+      dispatch(setErrorMessageAction(ERROR_RESORT));
     }
   };
 };
