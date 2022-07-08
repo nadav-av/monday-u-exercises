@@ -9,6 +9,8 @@ const ERROR_WHILE_REMOVE = "Error while removing task";
 const ERROR_WHILE_UPDATE = "Error while updating task";
 const ERROR_RESORT = "Error while resorting tasks";
 
+const DEBOUNCE_RATE_MS = 200;
+
 export {
   ALL,
   COMPLETED,
@@ -19,4 +21,5 @@ export {
   ERROR_WHILE_REMOVE,
   ERROR_WHILE_UPDATE,
   ERROR_RESORT,
+  DEBOUNCE_RATE_MS,
 };

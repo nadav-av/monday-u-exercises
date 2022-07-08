@@ -3,6 +3,8 @@ import PropTypes from "prop-types";
 import TaskItem from "../TaskItem/TaskItemConnector";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 import { COMPLETED, UNCOMPLETED } from "../../services/globalConsts";
+import { useDebounce } from "../../hooks/useDebounce";
+import { DEBOUNCE_RATE_MS } from "../../services/globalConsts";
 import "./taskList.css";
 
 const TasksList = ({
@@ -21,9 +23,13 @@ const TasksList = ({
 
   const [filteredTasks, setFilteredTasks] = useState([]);
 
+  const debouncedSearchInput = useDebounce(searchInput, DEBOUNCE_RATE_MS);
+
   useEffect(() => {
     const searchFilteredTasks = tasks.filter((task) => {
-      return task.itemName.toLowerCase().includes(searchInput.toLowerCase());
+      return task.itemName
+        .toLowerCase()
+        .includes(debouncedSearchInput.toLowerCase());
     });
 
     let statusFilteredTasks = [];
@@ -46,7 +52,7 @@ const TasksList = ({
 
     setFilteredTasks(statusFilteredTasks);
     setPresentedTasksNum(statusFilteredTasks.length);
-  }, [tasks, searchInput, statusFilter]);
+  }, [tasks, debouncedSearchInput, statusFilter]);
 
   const handleOnDragEnd = async (result) => {
     const items = [...tasks];

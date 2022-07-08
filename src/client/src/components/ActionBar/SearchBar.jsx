@@ -1,4 +1,5 @@
 import React, { useCallback } from "react";
+
 import "./searchBar.css";
 
 const SearchBar = ({ searchInput, setSearchInputAction }) => {
@@ -8,6 +9,7 @@ const SearchBar = ({ searchInput, setSearchInputAction }) => {
     },
     [setSearchInputAction]
   );
+
 
   return (
     <div className="search">
