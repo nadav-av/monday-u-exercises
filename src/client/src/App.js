@@ -16,7 +16,6 @@ const App = () => {
         <Navbar />
         <div className="container">
           <Routes>
-            {/* check that this commit is not inside PR */}
             <Route path="/" element={<Tasks exact />} />
             <Route path="/about" element={<About />} exact />
             <Route path="/tasks" element={<Tasks />} />

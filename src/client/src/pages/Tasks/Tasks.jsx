@@ -56,7 +56,7 @@ const Tasks = ({
           {errorMsg}
         </Toast>
         <div>
-          <Header headline="Tasks List" />
+          <Header headline="Tasks App" />
         </div>
 
         <ActionBar></ActionBar>
