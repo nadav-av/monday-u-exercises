@@ -1,0 +1,83 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<div
+  className="container"
+>
+  <div
+    className="app-wrapper about-wrap"
+  >
+    <div>
+      <div
+        className="header"
+      >
+        <h1>
+          About
+        </h1>
+      </div>
+      <div>
+        <img
+          alt="nadav avraham"
+          className="profile-pic"
+          src="aboutPhoto.jpg"
+        />
+      </div>
+      <div
+        className="about-data"
+      >
+        <div
+          className="data-row-item"
+        >
+          <div
+            className="data-row-item-title"
+          >
+            <i
+              className="fa-solid fa-graduation-cap"
+            />
+            Education
+          </div>
+          <div
+            className="data-row-item-value"
+          >
+            B.Sc. in Computer Science
+          </div>
+        </div>
+        <div
+          className="data-row-item"
+        >
+          <div
+            className="data-row-item-title"
+          >
+            <i
+              className="fa-solid fa-shield-halved"
+            />
+            Army Service
+          </div>
+          <div
+            className="data-row-item-value"
+          >
+            Paratroopers Brigade
+          </div>
+        </div>
+        <div
+          className="data-row-item"
+        >
+          <div
+            className="data-row-item-title"
+          >
+            <i
+              className="fa-solid fa-person-swimming"
+            />
+            Fun Fact
+          </div>
+          <div
+            className="data-row-item-value"
+          >
+            Former professional swimmer for Maccabi Rishon le Zion
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+`;
