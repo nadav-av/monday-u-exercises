@@ -64,7 +64,7 @@ const TasksList = ({
   };
 
   return (
-    <div>
+    <div data-testid="test-task-list">
       <DragDropContext onDragEnd={handleOnDragEnd}>
         <Droppable droppableId="tasks">
           {(provided) => (

@@ -32,6 +32,7 @@ const TaskItem = ({
 
   return (
     <div
+      data-testid={`item-${task.id}`}
       className="task-item"
       onMouseOver={handleMouseOver}
       onMouseOut={handleMouseOut}
