@@ -1,23 +1,33 @@
 import { Dropdown } from "monday-ui-react-core";
-import React from "react";
+import React, { useCallback } from "react";
+import { ALL, COMPLETED, UNCOMPLETED } from "../../services/globalConsts";
+import "./statusFilter.css";
 
-const StatusFilter = ({ filter, setFilter }) => {
+const StatusFilter = ({ setFilterAction }) => {
+  const setFilter = useCallback(
+    (e) => {
+      setFilterAction(e.value);
+    },
+    [setFilterAction]
+  );
+
   return (
     <Dropdown
-      className="selectDrop"
-      onOptionSelect={(e) => setFilter(e.value)}
+      className="dropdown-stories-styles_spacing selectDrop"
+      onOptionSelect={(e) => setFilter(e)}
+      onOptionRemove={() => setFilter({ value: ALL, label: "All" })}
       options={[
         {
           label: "All",
-          value: "all",
+          value: ALL,
         },
         {
           label: "Completed",
-          value: "completed",
+          value: COMPLETED,
         },
         {
           label: "Uncompleted",
-          value: "uncompleted",
+          value: UNCOMPLETED,
         },
       ]}
       placeholder="filter"

@@ -1,6 +1,16 @@
-import React from "react";
+import React, { useCallback } from "react";
 
-const SearchBar = ({ searchInput, setSearchInput }) => {
+import "./searchBar.css";
+
+const SearchBar = ({ searchInput, setSearchInputAction }) => {
+  const setSearchInput = useCallback(
+    (e) => {
+      setSearchInputAction(e.target.value);
+    },
+    [setSearchInputAction]
+  );
+
+
   return (
     <div className="search">
       <i className="fa-solid fa-magnifying-glass search-icon"></i>
@@ -9,7 +19,7 @@ const SearchBar = ({ searchInput, setSearchInput }) => {
         type="text"
         placeholder="search"
         value={searchInput}
-        onChange={(e) => setSearchInput(e.target.value)}
+        onChange={setSearchInput}
       />
     </div>
   );

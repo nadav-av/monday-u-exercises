@@ -1,20 +1,49 @@
-import React, { useEffect, useState } from "react";
-import PropTypes from "prop-types";
-import ItemClient from "../../services/taskService";
-
+import React, { useCallback, useEffect, useState } from "react";
+import UndoBtn from "./UndoBtnConnector";
+import { EMPTY_INPUT } from "../../services/globalConsts";
 import "./addTaskForm.css";
 
 const AddTaskForm = ({
   tasks,
-  setTasks,
   editTask,
-  setEditTask,
-  setErrorMessage,
-  setIsErrorShown,
+  isErrorToastVisible,
+  isTasksToRestoreExists,
+  addTaskAction,
+  updateTaskAction,
+  setErrorMessageAction,
+  setEditTaskAction,
+  setIsErrorToastVisibleAction,
 }) => {
+  const addTask = useCallback(
+    (input, status, position) => {
+      addTaskAction(input, status, position);
+    },
+    [addTaskAction]
+  );
+
+  const updateTask = useCallback(
+    (task) => {
+      updateTaskAction(task);
+    },
+    [updateTaskAction]
+  );
+
+  const setEditTask = useCallback(
+    (task) => {
+      setEditTaskAction(task);
+    },
+    [setEditTaskAction]
+  );
+
+  const setIsErrorToastVisible = useCallback(
+    (flag) => {
+      setIsErrorToastVisibleAction(flag);
+    },
+    [setIsErrorToastVisibleAction]
+  );
+
   const [input, setInput] = useState("");
 
-  const taskService = new ItemClient();
   let iconClassName;
 
   useEffect(() => {
@@ -33,52 +62,42 @@ const AddTaskForm = ({
     }
   };
 
-  const updateTask = async (input, id, itemName, status) => {
-    const taskToEdit = tasks.find((task) => task.id === id);
-    taskToEdit.itemName = input;
-    taskToEdit.status = status;
-    const isEdited = await taskService.updateTask(taskToEdit);
-    if (isEdited) {
-      setTasks(
-        tasks.map((task) => {
-          if (task.id === id) {
-            return taskToEdit;
-          }
-          return task;
-        })
-      );
-      setEditTask(null);
-    } else {
-      alert("Error updating task");
+  const setErrorMessage = (msg) => {
+    setErrorMessageAction(msg);
+  };
+
+  const isEmptyInputSubmitted = () => {
+    if (input.length === 0) {
+      setIsErrorToastVisible(true);
+      setErrorMessage(EMPTY_INPUT);
+      return true;
     }
+  };
+
+  const handleEditTask = () => {
+    const taskToEdit = tasks.find((task) => task.id === editTask.id);
+    taskToEdit.itemName = input;
+    updateTask(taskToEdit);
+    setEditTask(null);
   };
 
   const onFormSubmit = async (e) => {
     e.preventDefault();
-    setIsErrorShown(false);
-    if (input.length === 0) {
-      setErrorMessage("Cannot add an empy task");
-      setIsErrorShown(true);
+    if (isErrorToastVisible) {
+      setIsErrorToastVisible(false);
+    }
+    const isEmptyInput = isEmptyInputSubmitted();
+    if (isEmptyInput) {
       return;
     }
+
     if (editTask) {
-      updateTask(input, editTask.id, editTask.itemName, editTask.status);
+      handleEditTask();
     } else {
-      if (input.trim()) {
+      const trimmedInput = input.trim();
+      if (trimmedInput) {
         const position = tasks.length;
-        const res = await taskService.addTask(input, false, position);
-        if (res.status === 200) {
-          if (Array.isArray(res.response)) {
-            setTasks([...tasks, ...res.response]);
-          } else {
-            setTasks([...tasks, res.response]);
-          }
-        } else {
-          if (res.status === 409) {
-            setErrorMessage("Task already exists");
-            setIsErrorShown(true);
-          }
-        }
+        addTask(trimmedInput, false, position);
       }
     }
     setInput("");
@@ -97,15 +116,9 @@ const AddTaskForm = ({
         {setButtonIcon()}
         <i className={iconClassName}></i>
       </button>
+      {isTasksToRestoreExists && <UndoBtn />}
     </form>
   );
-};
-
-AddTaskForm.propTypes = {
-  tasks: PropTypes.array.isRequired,
-  setTasks: PropTypes.func.isRequired,
-  editTask: PropTypes.object,
-  setEditTask: PropTypes.func.isRequired,
 };
 
 export default AddTaskForm;

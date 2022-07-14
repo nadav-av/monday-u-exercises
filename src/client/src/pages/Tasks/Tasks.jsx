@@ -1,87 +1,82 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useEffect } from "react";
 import Header from "../../components/Header/Header.jsx";
-import AddTaskForm from "../../components/AddTaskForm/AddTaskForm.jsx";
-import TasksList from "../../components/TasksList/TasksList.jsx";
+import TasksList from "../../components/TasksList/TaskListConnector";
 import EmptyListNote from "../../components/EmptyListNote/EmptyListNote.jsx";
 import ActionBar from "../../components/ActionBar/ActionBar.jsx";
-import RemoveAllBtn from "../../components/RemoveAllButton/RemoveAllBtn.jsx";
+import RemoveAllBtn from "../../components/RemoveAllButton/RemoveAllBtnConnector";
 import { Toast } from "monday-ui-react-core";
+import AddTasksForm from "../../components/AddTaskForm/AddTaskFormConnector";
+import HashLoader from "react-spinners/HashLoader";
+
 import "./tasks.css";
 
-const Tasks = ({ tasks, setTasks, taskService }) => {
-  const [editTask, setEditTask] = useState(null);
-  const [searchInput, setSearchInput] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all");
+const Tasks = ({
+  tasks,
+  errorMsg,
+  isErrorToastVisible,
+  isLoading,
+  removeAllTasksAction,
+  getTasksAction,
+  setIsErrorToastVisibleAction,
+}) => {
+  const getTasks = useCallback(() => {
+    getTasksAction();
+  }, [getTasksAction]);
+
+  const setIsErrorVisable = useCallback(
+    (flag) => {
+      setIsErrorToastVisibleAction(flag);
+    },
+    [setIsErrorToastVisibleAction]
+  );
+
+  useEffect(() => {
+    getTasks();
+  }, []);
+
   const [presentedTasksNum, setPresentedTasksNum] = useState(0);
-  const [isErrorShown, setIsErrorShown] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
-
-  const handleCloseError = () => {
-    setIsErrorShown(false);
-  };
-
-  const handleRemoveAll = () => {
-    setTasks([]);
-    taskService.removeAllTasks();
-  };
 
   const showRemoveAllBtn = () => {
     if (presentedTasksNum === tasks.length && tasks.length > 0) {
-      return <RemoveAllBtn handleRemoveAll={handleRemoveAll} />;
+      return <RemoveAllBtn />;
     } else return null;
   };
 
   return (
     <div className="container">
       <div className="app-wrapper">
-        {isErrorShown && (
-          <Toast
-            className="monday-storybook-toast_wrapper"
-            open
-            onClose={handleCloseError}
-            type={Toast.types.NEGATIVE}
-            autoHideDuration={5000}
-          >
-            {errorMessage}
-          </Toast>
-        )}
-
+        <Toast
+          className="monday-storybook-toast_wrapper"
+          open={isErrorToastVisible}
+          onClose={() => {
+            setIsErrorVisable(false);
+          }}
+          type={Toast.types.NEGATIVE}
+        >
+          {errorMsg}
+        </Toast>
         <div>
           <Header headline="Tasks List" />
         </div>
 
-        <ActionBar
-          searchInput={searchInput}
-          setSearchInput={setSearchInput}
-          filter={statusFilter}
-          setFilter={setStatusFilter}
-        ></ActionBar>
+        <ActionBar></ActionBar>
         <div>
-          <AddTaskForm
-            tasks={tasks}
-            setTasks={setTasks}
-            editTask={editTask}
-            setEditTask={setEditTask}
-            setErrorMessage={setErrorMessage}
-            setIsErrorShown={setIsErrorShown}
-          />
+          <AddTasksForm />
         </div>
-        {/* if taskslist empty show empty message */}
-        {tasks.length === 0 ? (
-          <EmptyListNote />
-        ) : (
-          <div>
-            <TasksList
-              tasks={tasks}
-              statusFilter={statusFilter}
-              searchInput={searchInput}
-              setTasks={setTasks}
-              setEditTask={setEditTask}
-              setPresentedTasksNum={setPresentedTasksNum}
-            />
-          </div>
-        )}
-        <div>{showRemoveAllBtn()}</div>
+
+        <div>
+          {isLoading ? (
+            <div className="loading-wrapper">
+              <HashLoader color="#fea8a8" size="100px" />
+            </div>
+          ) : (
+            <div>
+              <div>{tasks.length === 0 ? <EmptyListNote /> : null}</div>
+              <TasksList setPresentedTasksNum={setPresentedTasksNum} />
+              {showRemoveAllBtn()}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

@@ -1,9 +1,26 @@
-import React, { useState } from "react";
+import React, { useState, useCallback } from "react";
 import PropTypes from "prop-types";
 import TaskButtons from "../TaskButtons/TaskButtons";
 import "./taskItem.css";
 
-const TaskItem = ({ task, setEditTask, handleComplete, handleDelete }) => {
+const TaskItem = ({
+  task,
+  setEditTaskAction,
+  updateTaskAction,
+  removeTaskAction,
+}) => {
+  const toggleTaskStatus = useCallback(() => {
+    updateTaskAction({ ...task, status: !task.status });
+  }, [updateTaskAction]);
+
+  const removeTask = useCallback(() => {
+    removeTaskAction(task.id);
+  }, [removeTaskAction]);
+
+  const setEditTask = useCallback(() => {
+    setEditTaskAction(task);
+  }, [setEditTaskAction]);
+
   const [isHovering, setIsHovering] = useState(false);
 
   const handleMouseOver = () => {
@@ -32,9 +49,9 @@ const TaskItem = ({ task, setEditTask, handleComplete, handleDelete }) => {
       {isHovering && (
         <TaskButtons
           key={task.id}
-          handleComplete={() => handleComplete(task)}
-          handleDelete={() => handleDelete(task)}
-          handleEdit={() => setEditTask(task)}
+          handleComplete={toggleTaskStatus}
+          handleDelete={removeTask}
+          handleEdit={setEditTask}
         />
       )}
     </div>
@@ -43,9 +60,6 @@ const TaskItem = ({ task, setEditTask, handleComplete, handleDelete }) => {
 
 TaskItem.propTypes = {
   task: PropTypes.object.isRequired,
-  setEditTask: PropTypes.func.isRequired,
-  handleComplete: PropTypes.func.isRequired,
-  handleDelete: PropTypes.func.isRequired,
 };
 
 export default TaskItem;

@@ -1,13 +1,13 @@
 import React from "react";
 import "./actionBar.css";
-import SearchBar from "./SearchBar";
-import StatusFilter from "./StatusFilter";
+import SearchBar from "./SearchBarConnector";
+import StatusFilter from "./statusFilterConnector";
 
-const ActionBar = ({ searchInput, setSearchInput, filter, setFilter }) => {
+const ActionBar = () => {
   return (
     <div className="actions">
-      <SearchBar searchInput={searchInput} setSearchInput={setSearchInput} />
-      <StatusFilter filter={filter} setFilter={setFilter} />
+      <SearchBar/>
+      <StatusFilter/>
     </div>
   );
 };
