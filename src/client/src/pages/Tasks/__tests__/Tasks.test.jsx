@@ -2,6 +2,7 @@ import { render, screen } from "@testing-library/react";
 import Tasks from "../TasksConnector";
 import { Provider } from "react-redux";
 import { store } from "../../../redux/store";
+import { getTasksAction } from "../../../redux/actions/tasksActions";
 
 const tasks = [
   {
@@ -28,15 +29,22 @@ describe("Tasks", () => {
   test("should render both items (one done and one not)", () => {
     render(
       <Provider store={store}>
-        <Tasks
-          tasks={tasks}
-          setPresentedTasksNum={() => {}}
-          fetchItems={jest.fn(() => tasks)}
-        />
+        <Tasks tasks={tasks} />
       </Provider>
     );
 
     expect(screen.queryByTestId(`item-${tasks[0].id}`)).toBeDefined();
     expect(screen.queryByTestId(`item-${tasks[1].id}`)).toBeDefined();
+  });
+
+  // A test to mock get tasks action - not sure why, but this test fails, the getTasksActin in not called in test.
+  test("should call fetchItems function", () => {
+    const fetchItems = jest.fn(() => tasks);
+    render(
+      <Provider store={store}>
+        <Tasks getTasksAction={fetchItems} />
+      </Provider>
+    );
+    expect(fetchItems).toHaveBeenCalled();
   });
 });

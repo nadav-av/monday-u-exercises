@@ -15,7 +15,6 @@ const Tasks = ({
   errorMsg,
   isErrorToastVisible,
   isLoading,
-  removeAllTasksAction,
   getTasksAction,
   setIsErrorToastVisibleAction,
 }) => {
