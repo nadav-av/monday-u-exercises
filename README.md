@@ -12,6 +12,7 @@ This app was built by me as part of MondayU academy, at the FullStack Bootcamp.
 - Filter your tasks to show only the completed or uncompleted tasks.
 - Search for a task by inputting words that the task might contain.
 - Delete a single task.
+- Restore deleted tasks (up to the last 10 deletions).
 - Delete all tasks.
 - Edit task.
 - Reoreder tasks using drag and drop.
@@ -19,8 +20,9 @@ This app was built by me as part of MondayU academy, at the FullStack Bootcamp.
 - Add multiple pokemon catch tasks by inputting comma separate names or ids of wanted Pokemons.
 - See some conclusion statistics about your tasks (statistics page).
 
+
 ### Technologies used:
 
-- Frontend: React, HTML, CSS
+- Frontend: React, Redux, HTML, CSS
 - Backend: NodeJS, ORM sequelize
 - Database: MySQL server
