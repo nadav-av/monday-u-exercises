@@ -15,7 +15,7 @@ const StatusFilter = ({ setFilterAction }) => {
     <Dropdown
       className="dropdown-stories-styles_spacing selectDrop"
       onOptionSelect={(e) => setFilter(e)}
-      onOptionRemove={() => setFilter({ value: ALL, label: "All" })}
+      onOptionRemove={() => setFilter({ value: TaskStatus.ALL, label: "All" })}
       options={[
         {
           label: "All",
