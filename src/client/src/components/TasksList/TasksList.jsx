@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import PropTypes from "prop-types";
 import TaskItem from "../TaskItem/TaskItemConnector";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-import { COMPLETED, UNCOMPLETED } from "../../services/globalConsts";
+import { TaskStatus } from "../../services/globalConsts";
 import { useDebounce } from "../../hooks/useDebounce";
 import { DEBOUNCE_RATE_MS } from "../../services/globalConsts";
 import "./taskList.css";
@@ -35,12 +35,12 @@ const TasksList = ({
     let statusFilteredTasks = [];
 
     switch (statusFilter) {
-      case COMPLETED:
+      case TaskStatus.COMPLETED:
         statusFilteredTasks = searchFilteredTasks.filter(
           (task) => task.status === true
         );
         break;
-      case UNCOMPLETED:
+      case TaskStatus.UNCOMPLETED:
         statusFilteredTasks = searchFilteredTasks.filter(
           (task) => task.status === false
         );

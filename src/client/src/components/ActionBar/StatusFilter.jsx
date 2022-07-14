@@ -1,6 +1,6 @@
 import { Dropdown } from "monday-ui-react-core";
 import React, { useCallback } from "react";
-import { ALL, COMPLETED, UNCOMPLETED } from "../../services/globalConsts";
+import { TaskStatus } from "../../services/globalConsts";
 import "./statusFilter.css";
 
 const StatusFilter = ({ setFilterAction }) => {
@@ -19,15 +19,15 @@ const StatusFilter = ({ setFilterAction }) => {
       options={[
         {
           label: "All",
-          value: ALL,
+          value: TaskStatus.ALL,
         },
         {
           label: "Completed",
-          value: COMPLETED,
+          value: TaskStatus.COMPLETED,
         },
         {
           label: "Uncompleted",
-          value: UNCOMPLETED,
+          value: TaskStatus.UNCOMPLETED,
         },
       ]}
       placeholder="filter"

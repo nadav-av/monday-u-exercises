@@ -1,9 +1,9 @@
 import actionTypes from "../actions/actionBarConstants";
-import { ALL } from "../../services/globalConsts";
+import { TaskStatus } from "../../services/globalConsts";
 
 const initialState = {
   searchInput: "",
-  filter: ALL,
+  filter: TaskStatus.ALL,
 };
 
 const actionBarReducer = (state = initialState, action) => {
