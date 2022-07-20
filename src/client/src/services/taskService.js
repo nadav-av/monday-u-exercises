@@ -1,6 +1,6 @@
 class ItemClient {
   constructor() {
-    this.serverURL = "http://localhost:3042/tasks/";
+    this.serverURL = "/tasks/";
   }
 
   async fetchTasks() {
