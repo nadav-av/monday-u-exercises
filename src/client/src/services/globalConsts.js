@@ -1,6 +1,8 @@
-const ALL = "all";
-const COMPLETED = "completed";
-const UNCOMPLETED = "uncompleted";
+const TaskStatus = Object.freeze({
+  ALL: "all",
+  COMPLETED: "completed",
+  UNCOMPLETED: "uncompleted",
+});
 
 const TASK_EXISTS = "Task already exists";
 const EMPTY_INPUT = "Input cannot be empty, Please enter a task";
@@ -12,9 +14,7 @@ const ERROR_RESORT = "Error while resorting tasks";
 const DEBOUNCE_RATE_MS = 200;
 
 export {
-  ALL,
-  COMPLETED,
-  UNCOMPLETED,
+  TaskStatus,
   TASK_EXISTS,
   EMPTY_INPUT,
   ERROR_WHILE_REMOVE_ALL,

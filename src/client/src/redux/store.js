@@ -11,6 +11,6 @@ export const store = configureStore({
     actionBar: actionBarReducer,
     errorHandle: errorHandleReducer,
   },
-  middleware: [thunkMiddleware, logger],
+  middleware: [thunkMiddleware],
   preloadedState: {},
 });

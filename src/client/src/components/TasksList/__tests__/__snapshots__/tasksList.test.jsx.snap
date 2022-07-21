@@ -1,0 +1,13 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`renders correctly 1`] = `
+<div
+  data-testid="test-task-list"
+>
+  <ul
+    className="tasks"
+    data-rbd-droppable-context-id="0"
+    data-rbd-droppable-id="tasks"
+  />
+</div>
+`;

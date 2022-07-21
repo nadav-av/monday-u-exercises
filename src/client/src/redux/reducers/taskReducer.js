@@ -16,6 +16,7 @@ const tasksReducers = (state = initialState, action) => {
       return {
         ...state,
         tasksArray: [...state.tasksArray, action.payload],
+
       };
 
     case actionTypes.REMOVE_TASK: {

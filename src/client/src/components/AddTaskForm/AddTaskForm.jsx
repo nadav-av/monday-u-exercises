@@ -76,8 +76,9 @@ const AddTaskForm = ({
 
   const handleEditTask = () => {
     const taskToEdit = tasks.find((task) => task.id === editTask.id);
-    taskToEdit.itemName = input;
-    updateTask(taskToEdit);
+    const taskToEditClone = { ...taskToEdit };
+    taskToEditClone.itemName = input;
+    updateTask(taskToEditClone);
     setEditTask(null);
   };
 
